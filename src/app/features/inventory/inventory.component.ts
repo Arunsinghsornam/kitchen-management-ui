@@ -1,0 +1,342 @@
+﻿import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { InventoryService } from './inventory.service';
+
+@Component({
+  selector: 'app-inventory',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+
+  template: `
+    <div class="inventory-page">
+
+      <div class="page-header">
+        <div>
+          <h1>Inventory</h1>
+          <p>Manage raw materials and stock levels</p>
+        </div>
+
+        <button class="add-btn" (click)="showAddForm = true">
+          + Add Item
+        </button>
+      </div>
+
+      <div class="inventory-card">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Unit</th>
+              <th>Stock</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>{{ item.code }}</td>
+
+              <td>
+                <strong>{{ item.name }}</strong>
+              </td>
+
+              <td>{{ item.categoryName }}</td>
+
+              <td>{{ item.unit }}</td>
+
+              <td>
+                <span
+                  class="stock-badge"
+                  [class.low-stock]="item.currentStock <= item.reorderLevel">
+                  {{ item.currentStock }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Item Modal -->
+      <div *ngIf="showAddForm" class="modal">
+        <div class="modal-box">
+
+          <h2>New Raw Material</h2>
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Item Code</label>
+              <input
+                [(ngModel)]="newItem.code"
+                placeholder="RM001">
+            </div>
+
+            <div class="form-group">
+              <label>Item Name</label>
+              <input
+                [(ngModel)]="newItem.name"
+                placeholder="Tomato">
+            </div>
+
+            <div class="form-group">
+              <label>Unit</label>
+              <select [(ngModel)]="newItem.unit">
+                <option value="Kg">Kg</option>
+                <option value="Gram">Gram</option>
+                <option value="Litre">Litre</option>
+                <option value="Piece">Piece</option>
+                <option value="Pack">Pack</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select [(ngModel)]="newItem.categoryId">
+                <option [ngValue]="null">Select Category</option>
+
+                <option
+                  *ngFor="let cat of categories"
+                  [ngValue]="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Reorder Level</label>
+              <input
+                type="number"
+                [(ngModel)]="newItem.reorderLevel">
+            </div>
+
+          </div>
+
+          <div class="modal-actions">
+            <button class="save-btn" (click)="saveItem()">
+              Save
+            </button>
+
+            <button
+              class="cancel-btn"
+              (click)="showAddForm = false">
+              Cancel
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  `,
+
+  styles: [`
+    .inventory-page{
+      padding:32px;
+    }
+
+    .page-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:24px;
+    }
+
+    .page-header h1{
+      margin:0;
+      font-size:40px;
+      font-weight:700;
+    }
+
+    .page-header p{
+      color:#777;
+      margin-top:6px;
+    }
+
+    .add-btn{
+      background:#ff6b00;
+      color:white;
+      border:none;
+      padding:12px 20px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .inventory-card{
+      background:white;
+      border-radius:16px;
+      padding:24px;
+      box-shadow:0 2px 10px rgba(0,0,0,.05);
+    }
+
+    .inventory-table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    .inventory-table th{
+      text-align:left;
+      padding:14px;
+      border-bottom:1px solid #eee;
+      color:#777;
+      font-size:14px;
+    }
+
+    .inventory-table td{
+      padding:14px;
+      border-bottom:1px solid #f2f2f2;
+    }
+
+    .stock-badge{
+      background:#eaf7ee;
+      color:#2e7d32;
+      padding:6px 12px;
+      border-radius:20px;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    .low-stock{
+      background:#fdecec;
+      color:#c62828;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      z-index:1000;
+    }
+
+    .modal-box{
+      width:600px;
+      background:white;
+      border-radius:16px;
+      padding:24px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .form-group{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .form-group label{
+      margin-bottom:6px;
+      font-weight:600;
+    }
+
+    .form-group input,
+    .form-group select{
+      padding:10px;
+      border:1px solid #ddd;
+      border-radius:8px;
+    }
+
+    .modal-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:20px;
+    }
+
+    .save-btn{
+      background:#ff6b00;
+      color:white;
+      border:none;
+      padding:10px 20px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    .cancel-btn{
+      background:#eee;
+      border:none;
+      padding:10px 20px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+  `]
+})
+export class InventoryComponent implements OnInit {
+
+  items: any[] = [];
+  categories: any[] = [];
+
+  showAddForm = false;
+
+  newItem: any = {
+    code: '',
+    name: '',
+    unit: 'Kg',
+    reorderLevel: 0,
+    categoryId: null
+  };
+
+  constructor(
+    private inventoryService: InventoryService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadInventory();
+    this.loadCategories();
+  }
+
+  loadInventory(): void {
+    this.inventoryService.getAll().subscribe({
+      next: (data) => {
+        this.items = data;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  loadCategories(): void {
+    this.inventoryService.getCategories().subscribe({
+      next: (data) => {
+        this.categories = data;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+
+  saveItem(): void {
+    this.inventoryService.create(this.newItem).subscribe({
+      next: () => {
+        alert('Raw Material Added');
+
+        this.showAddForm = false;
+
+        this.newItem = {
+          code: '',
+          name: '',
+          unit: 'Kg',
+          reorderLevel: 0,
+          categoryId: null
+        };
+
+        this.loadInventory();
+      },
+
+      error: (err) => {
+        console.error(err);
+        alert('Failed to save');
+      }
+    });
+  }
+}

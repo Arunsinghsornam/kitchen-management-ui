@@ -1,0 +1,329 @@
+<!-- =============================================================
+  FILE: src/app/pages/pl-report/pl-report.component.html
+  Tailwind CSS classes assumed (same setup as your existing Angular app)
+  ============================================================= -->
+
+<div class="pl-container">
+
+  <!-- ── Page Header ─────────────────────────────────────────── -->
+ <div class="pl-header">
+  <h1>P&L Report</h1>
+  <p>
+    Revenue, cost of goods sold, and gross profit analysis
+  </p>
+</div>
+
+  <!-- ── Filter Bar ───────────────────────────────────────────── -->
+ <div class="filter-card">
+    <div class="filter-row">
+
+      <!-- Date From -->
+      <div class="filter-group">
+        <label class="text-xs font-medium text-gray-600">From</label>
+        <input type="date" [(ngModel)]="dateFrom"
+               class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+      </div>
+
+      <!-- Date To -->
+     <!-- Date To -->
+<div class="filter-group">
+  <label>To</label>
+  <input
+    type="date"
+    [(ngModel)]="dateTo">
+</div>
+
+      <!-- Apply -->
+      <button
+  class="btn-primary"
+  (click)="load()">
+  Apply
+</button>
+
+      <!-- Divider -->
+      <span class="hidden text-gray-300 sm:block">|</span>
+
+      <!-- Quick presets -->
+      <div class="flex flex-wrap gap-2">
+       <button class="btn-secondary" (click)="setPreset(7)">
+  Last 7 days
+</button>
+
+<button class="btn-secondary" (click)="setPreset(30)">
+  Last 30 days
+</button>
+
+<button class="btn-secondary" (click)="setThisMonth()">
+  This month
+</button>
+
+<button class="btn-secondary" (click)="setLastMonth()">
+  Last month
+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Error ────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      ⚠️ {{ error() }}
+    </div>
+  }
+
+  <!-- ── Loading skeleton ─────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
+      @for (i of [1,2,3,4,5]; track i) {
+        <div class="h-24 animate-pulse rounded-xl bg-gray-200"></div>
+      }
+    </div>
+    <div class="h-64 animate-pulse rounded-xl bg-gray-200"></div>
+  }
+
+  <!-- ── Main content ─────────────────────────────────────────── -->
+  @if (!loading() && report(); as r) {
+
+    <!-- Summary Cards -->
+    @if (summaryCards(); as cards) {
+      <div class="summary-grid">
+        @for (card of cards; track card.label) {
+         <div class="summary-card">
+            <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{{ card.label }}</p>
+            <p class="mt-2 text-xl font-bold text-gray-900">
+              @if (card.type === 'currency') { {{ fmtINR(card.value) }} }
+              @else if (card.type === 'percent') { {{ card.value | number:'1.1-1' }}% }
+              @else { {{ card.value | number }} }
+            </p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button (click)="setTab('daily')"
+              [class.tab-active]="activeTab() === 'daily'"
+              class="tab-btn">Daily</button>
+      <button (click)="setTab('monthly')"
+              [class.tab-active]="activeTab() === 'monthly'"
+              class="tab-btn">Monthly</button>
+      <button (click)="setTab('channel')"
+              [class.tab-active]="activeTab() === 'channel'"
+              class="tab-btn">By Channel</button>
+    </div>
+
+    <!-- ── DAILY TABLE ─────────────────────────────────────── -->
+    @if (activeTab() === 'daily') {
+      <div class="table-card">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <th class="px-4 py-3 text-left">Date</th>
+              <th class="px-4 py-3 text-left">Day</th>
+              <th class="px-4 py-3 text-right">Orders</th>
+              <th class="px-4 py-3 text-right">Gross Rev</th>
+              <th class="px-4 py-3 text-right">Discount</th>
+              <th class="px-4 py-3 text-right">Net Revenue</th>
+              <th class="px-4 py-3 text-right">COGS</th>
+              <th class="px-4 py-3 text-right">Gross Profit</th>
+              <th class="px-4 py-3 text-right">Margin %</th>
+              <th class="px-4 py-3 text-right">Purchase Spend</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of r.daily; track trackByDate($index, row)) {
+              <tr class="border-b border-gray-50 hover:bg-orange-50 transition-colors">
+                <td class="px-4 py-3 font-medium text-gray-800">{{ row.date }}</td>
+                <td class="px-4 py-3 text-gray-500">{{ row.dayName }}</td>
+                <td class="px-4 py-3 text-right text-gray-700">{{ row.orders }}</td>
+                <td class="px-4 py-3 text-right text-gray-700">{{ fmtINR(row.grossRevenue) }}</td>
+                <td class="px-4 py-3 text-right text-red-500">
+                  @if (row.discount > 0) { -{{ fmtINR(row.discount) }} }
+                  @else { — }
+                </td>
+                <td class="px-4 py-3 text-right font-medium text-gray-900">{{ fmtINR(row.netRevenue) }}</td>
+                <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(row.cogs) }}</td>
+                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.grossProfit)">
+                  {{ fmtINR(row.grossProfit) }}
+                </td>
+                <td class="px-4 py-3 text-right" [class]="marginClass(row.grossMarginPct)">
+                  {{ row.grossMarginPct | number:'1.1-1' }}%
+                </td>
+                <td class="px-4 py-3 text-right text-gray-500">{{ fmtINR(row.purchaseSpend) }}</td>
+              </tr>
+            }
+          </tbody>
+          <!-- Totals row -->
+          <tfoot>
+            <tr class="bg-orange-50 border-t-2 border-orange-200 font-bold text-gray-900 text-sm">
+              <td class="px-4 py-3" colspan="2">Total</td>
+              <td class="px-4 py-3 text-right">{{ r.totalOrders }}</td>
+      <td class="px-4 py-3 text-right">
+  {{ fmtINR(r.totalRevenue || 0) }}
+</td>
+
+<td class="px-4 py-3 text-right">
+  {{ fmtINR(r.totalDiscount || 0) }}
+</td>
+
+<td class="px-4 py-3 text-right">
+  {{ fmtINR(r.totalRevenue) }}
+</td>
+              <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(r.totalCogs) }}</td>
+              <td class="px-4 py-3 text-right" [class]="profitClass(r.totalGrossProfit)">{{ fmtINR(r.totalGrossProfit) }}</td>
+              <td class="px-4 py-3 text-right" [class]="marginClass(r.avgMarginPct)">{{ r.avgMarginPct | number:'1.1-1' }}%</td>
+              <td class="px-4 py-3 text-right text-red-600">
+  {{ fmtINR(r.totalPurchaseSpend) }}
+</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    }
+
+    <!-- ── MONTHLY TABLE ───────────────────────────────────── -->
+    @if (activeTab() === 'monthly') {
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              <th class="px-4 py-3 text-left">Month</th>
+              <th class="px-4 py-3 text-right">Orders</th>
+              <th class="px-4 py-3 text-right">Gross Revenue</th>
+              <th class="px-4 py-3 text-right">Discount</th>
+              <th class="px-4 py-3 text-right">Net Revenue</th>
+              <th class="px-4 py-3 text-right">COGS</th>
+              <th class="px-4 py-3 text-right">Gross Profit</th>
+              <th class="px-4 py-3 text-right">Margin %</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of r.monthly; track trackByMonth($index, row)) {
+              <tr class="border-b border-gray-50 hover:bg-orange-50 transition-colors">
+                <td class="px-4 py-3 font-medium text-gray-800">{{ row.monthName }} {{ row.year }}</td>
+                <td class="px-4 py-3 text-right text-gray-700">{{ row.orders }}</td>
+                <td class="px-4 py-3 text-right text-gray-700">{{ fmtINR(row.grossRevenue) }}</td>
+                <td class="px-4 py-3 text-right text-red-500">
+                  @if (row.discount > 0) { -{{ fmtINR(row.discount) }} }
+                  @else { — }
+                </td>
+                <td class="px-4 py-3 text-right font-medium text-gray-900">{{ fmtINR(row.netRevenue) }}</td>
+                <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(row.cogs) }}</td>
+                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.grossProfit)">
+                  {{ fmtINR(row.grossProfit) }}
+                </td>
+                <td class="px-4 py-3 text-right" [class]="marginClass(row.grossMarginPct)">
+                  {{ row.grossMarginPct | number:'1.1-1' }}%
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- ── CHANNEL TABLE ───────────────────────────────────── -->
+   
+         @if (activeTab() === 'channel') {
+  <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-x-auto">
+    <table class="min-w-full text-sm">
+
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          <th class="px-4 py-3 text-left">Channel</th>
+          <th class="px-4 py-3 text-right">Orders</th>
+          <th class="px-4 py-3 text-right">Net Revenue</th>
+          <th class="px-4 py-3 text-right">COGS</th>
+          <th class="px-4 py-3 text-right">Gross Profit</th>
+          <th class="px-4 py-3 text-right">Margin %</th>
+          <th class="px-4 py-3 text-right">Revenue Share</th>
+        </tr>
+      </thead>
+
+      <tbody>
+  @for (row of r.channels; track trackByChannel($index, row)) {
+
+    <tr class="bg-orange-50 border-b border-orange-200 text-sm font-semibold text-gray-700">
+
+      <td class="px-5 py-4 text-center">
+        <span
+          class="channel-badge"
+          [ngClass]="channelClass(row.channel)">
+          {{ row.channel }}
+        </span>
+      </td>
+
+      <td class="px-4 py-3 text-right">
+        {{ row.orders }}
+      </td>
+
+      <td class="px-4 py-3 text-right font-medium">
+        {{ fmtINR(row.netRevenue) }}
+      </td>
+
+      <td class="px-4 py-3 text-right text-orange-600">
+        {{ fmtINR(row.cogs) }}
+      </td>
+
+      <td
+        class="px-4 py-3 text-right font-semibold"
+        [class]="profitClass(row.grossProfit)">
+        {{ fmtINR(row.grossProfit) }}
+      </td>
+
+      <td
+        class="px-4 py-3 text-right"
+        [class]="marginClass(row.grossMarginPct)">
+        {{ row.grossMarginPct | number:'1.1-1' }}%
+      </td>
+
+      <td class="px-4 py-3 text-right">
+        {{ row.revenueSharePct | number:'1.1-1' }}%
+      </td>
+
+    </tr>
+
+  }
+  <tr class="bg-orange-50 border-t-2 border-orange-200 font-bold">
+  <td class="px-5 py-4">Total</td>
+  <td class="px-5 py-4 text-right">{{ r.totalOrders }}</td>
+  <td class="px-5 py-4 text-right">{{ fmtINR(r.totalRevenue) }}</td>
+  <td class="px-5 py-4 text-right">{{ fmtINR(r.totalCogs) }}</td>
+  <td class="px-5 py-4 text-right">{{ fmtINR(r.totalGrossProfit) }}</td>
+  <td class="px-5 py-4 text-right">{{ r.avgMarginPct | number:'1.1-1' }}%</td>
+  <td class="px-5 py-4 text-right">100%</td>
+</tr>
+</tbody>
+          
+        </table>
+      </div>
+    }
+
+  } <!-- end @if report -->
+
+  <!-- ── Empty state ──────────────────────────────────────────── -->
+  @if (!loading() && !report() && !error()) {
+    <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+      <span class="text-5xl mb-3">📊</span>
+      <p class="text-sm">Select a date range and click Apply to load the report.</p>
+    </div>
+  }
+
+</div>
+
+<!-- Tailwind arbitrary utility classes used above.
+     Add these to your global styles.css if not using a Tailwind plugin:
+
+.preset-btn {
+  @apply rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium
+         text-gray-600 hover:bg-gray-100 focus:outline-none;
+}
+.tab-btn {
+  @apply rounded-lg px-4 py-1.5 text-sm font-medium text-gray-500
+         hover:text-gray-800 transition-colors;
+}
+.tab-active {
+  @apply bg-orange-500 text-white shadow-sm;
+}
+-->

@@ -1,0 +1,186 @@
+<div class="page">
+
+  <div class="header">
+
+    <div>
+      <h1>Purchases</h1>
+      <p>Manage purchase orders and supplier invoices</p>
+    </div>
+
+    <button
+      class="add-btn"
+      (click)="newPurchase()">
+
+      + Add Purchase
+
+    </button>
+
+  </div>
+
+  <div class="cards">
+
+    <div class="card">
+      <span>Total Purchases</span>
+      <h2>{{ totalPurchases }}</h2>
+    </div>
+
+    <div class="card">
+      <span>Total Spend</span>
+      <h2>₹{{ totalAmount | number:'1.0-0' }}</h2>
+    </div>
+
+  </div>
+
+  <div class="search-box">
+
+    <input
+      [(ngModel)]="searchText"
+      placeholder="Search invoice or supplier">
+
+  </div>
+
+  <div
+    *ngIf="showForm"
+    class="form-card">
+
+    <h3>New Purchase</h3>
+
+    <div class="grid">
+
+      <select [(ngModel)]="purchase.supplierId">
+
+        <option value="">
+          Select Supplier
+        </option>
+
+        <option
+          *ngFor="let s of suppliers"
+          [value]="s.id">
+
+          {{ s.name }}
+
+        </option>
+
+      </select>
+
+      <input
+        [(ngModel)]="purchase.invoiceNumber"
+        placeholder="Invoice Number">
+
+      <input
+        type="date"
+        [(ngModel)]="purchase.purchaseDate">
+
+    </div>
+
+    <button
+      class="secondary-btn"
+      (click)="addItem()">
+
+      + Add Item
+
+    </button>
+
+    <div
+      class="item-row"
+      *ngFor="let item of purchase.items; let i=index">
+
+      <select [(ngModel)]="item.rawMaterialId">
+
+        <option value="">
+          Select Material
+        </option>
+
+        <option
+          *ngFor="let m of materials"
+          [value]="m.id">
+
+          {{ m.name }}
+
+        </option>
+
+      </select>
+
+      <input
+        type="number"
+        [(ngModel)]="item.quantity"
+        placeholder="Qty">
+
+      <input
+        type="number"
+        [(ngModel)]="item.unitCost"
+        placeholder="Unit Cost">
+
+      <input
+        type="number"
+        [(ngModel)]="item.gstPercent"
+        placeholder="GST %">
+
+      <button
+        class="remove-btn"
+        (click)="removeItem(i)">
+
+        Remove
+
+      </button>
+
+    </div>
+
+    <button
+      class="save-btn"
+      (click)="savePurchase()">
+
+      Save Purchase
+
+    </button>
+
+  </div>
+
+  <div class="table-card">
+
+    <h3>Purchase History</h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Invoice</th>
+          <th>Supplier</th>
+          <th>Date</th>
+          <th>Subtotal</th>
+          <th>GST</th>
+          <th>Total</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let p of filteredPurchases()">
+
+          <td>{{ p.invoiceNumber }}</td>
+
+          <td>{{ p.supplierName }}</td>
+
+          <td>{{ p.purchaseDate | date:'dd-MM-yyyy' }}</td>
+
+          <td>₹{{ p.subtotal }}</td>
+
+          <td>₹{{ p.gstAmount }}</td>
+
+          <td>
+            <strong>
+              ₹{{ p.total }}
+            </strong>
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>

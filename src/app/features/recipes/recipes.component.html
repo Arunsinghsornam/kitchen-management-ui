@@ -1,0 +1,295 @@
+<div class="recipes-container">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <div>
+      <h2>Recipes</h2>
+      <small>Manage menu recipes and ingredient costing</small>
+    </div>
+
+    <button
+      class="btn-primary"
+      (click)="newRecipe()">
+      + Add Recipe
+    </button>
+
+  </div>
+
+  <!-- DASHBOARD CARDS -->
+  <div class="cards">
+
+    <div class="card">
+      <span>Total Recipes</span>
+      <h2>{{ totalRecipes }}</h2>
+    </div>
+
+    <div class="card">
+      <span>Average Cost</span>
+      <h2>₹{{ averageCost | number:'1.2-2' }}</h2>
+    </div>
+
+    <div class="card">
+      <span>Highest Margin</span>
+      <h2>{{ highestMargin | number:'1.0-0' }}%</h2>
+    </div>
+
+    <div class="card">
+      <span>Lowest Margin</span>
+      <h2>{{ lowestMargin | number:'1.0-0' }}%</h2>
+    </div>
+
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-box">
+
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      placeholder="Search recipes...">
+
+  </div>
+
+  <!-- RECIPE GRID -->
+  <div class="recipe-grid">
+
+    <div
+      class="recipe-card"
+      *ngFor="let recipe of filteredRecipes()">
+
+      <div class="recipe-header">
+
+        <div>
+
+          <h3>{{ recipe.name }}</h3>
+
+          <div class="category">
+            {{ recipe.category }}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="recipe-stats">
+
+        <div class="stat-row">
+          <span>Selling Price</span>
+          <strong>
+            ₹{{ recipe.sellingPrice | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Recipe Cost</span>
+          <strong>
+            ₹{{ recipe.recipeCost | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Profit</span>
+          <strong>
+            ₹{{ getProfit(recipe) | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Margin</span>
+          <strong>
+            {{ getMargin(recipe) | number:'1.0-0' }}%
+          </strong>
+        </div>
+
+      </div>
+
+      <div class="ingredients-section">
+
+        <h4>Ingredients</h4>
+
+        <div
+          class="ingredient-item"
+          *ngFor="let item of recipe.ingredients">
+
+          <span>
+            {{ item.rawMaterialName }}
+          </span>
+
+          <span>
+            {{ item.quantity }}
+            {{ item.unit }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <div class="recipe-actions">
+
+        <button
+          class="btn-primary"
+          (click)="editRecipe(recipe)">
+          Edit
+        </button>
+
+       <button
+  class="btn-danger"
+  (click)="deleteRecipe(recipe)">
+  Delete
+</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div
+    class="modal-backdrop"
+    *ngIf="showForm">
+
+    <div class="modal-container">
+
+      <div class="modal-header">
+
+        <h2>
+          {{ editing ? 'Edit Recipe' : 'New Recipe' }}
+        </h2>
+
+        <button
+          class="close-btn"
+          (click)="cancel()">
+          ✕
+        </button>
+
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label>Recipe Name</label>
+
+          <input
+            type="text"
+            [(ngModel)]="recipe.name"
+            placeholder="Enter recipe name">
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Category</label>
+
+          <input
+            type="text"
+            [(ngModel)]="recipe.category"
+            placeholder="Category">
+
+        </div>
+
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label>Selling Price</label>
+
+          <input
+            type="number"
+            [(ngModel)]="recipe.sellingPrice">
+
+        </div>
+
+      </div>
+
+      <div class="cost-box">
+
+        <strong>
+          Estimated Recipe Cost:
+        </strong>
+
+        ₹{{ calculateRecipeCost() | number:'1.2-2' }}
+
+      </div>
+
+      <div class="ingredient-header">
+
+        <h3>Ingredients</h3>
+
+        <button
+          class="btn-primary"
+          (click)="addIngredient()">
+          + Add Ingredient
+        </button>
+
+      </div>
+
+      <div
+        class="ingredient-row"
+        *ngFor="let item of recipe.ingredients; let i = index">
+
+        <select
+          [(ngModel)]="item.rawMaterialId">
+
+          <option value="">
+            Select Material
+          </option>
+
+          <option
+            *ngFor="let rm of rawMaterials"
+            [value]="rm.id">
+
+            {{ rm.name }}
+
+          </option>
+
+        </select>
+
+        <input
+          type="number"
+          [(ngModel)]="item.quantity"
+          placeholder="Quantity">
+
+        <span class="unit-badge">
+
+          {{
+            getMaterial(item.rawMaterialId)?.unit
+          }}
+
+        </span>
+
+        <button
+          class="btn-danger"
+          (click)="removeIngredient(i)">
+          Remove
+        </button>
+
+      </div>
+
+      <div class="modal-actions">
+
+        <button
+          class="btn-secondary"
+          (click)="cancel()">
+          Cancel
+        </button>
+
+        <button
+          class="btn-success"
+          (click)="save()">
+
+          {{ editing ? 'Update Recipe' : 'Save Recipe' }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
