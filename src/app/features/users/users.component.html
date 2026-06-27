@@ -1,0 +1,274 @@
+```html
+<div class="users-page">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+
+    <div>
+      <h1>User Management</h1>
+      <p>Manage system users and permissions</p>
+    </div>
+
+    <button
+      class="btn-primary"
+      (click)="addUser()">
+
+      + New User
+
+    </button>
+
+  </div>
+
+  <!-- SEARCH BAR -->
+  <div class="toolbar">
+
+    <input
+      type="text"
+      placeholder="Search users..." />
+
+  </div>
+
+  <!-- CREATE / EDIT USER -->
+  <div
+    class="user-form-card"
+    *ngIf="showAddForm">
+
+    <h2>
+
+      {{ editing ? 'Edit User' : 'Create User' }}
+
+    </h2>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label>Full Name</label>
+
+        <input
+          type="text"
+          [(ngModel)]="newUser.fullName">
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Email</label>
+
+        <input
+          type="email"
+          [(ngModel)]="newUser.email"
+          [disabled]="editing">
+
+      </div>
+
+      <div
+        class="form-group"
+        *ngIf="!editing">
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          [(ngModel)]="newUser.password">
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Role</label>
+
+        <select [(ngModel)]="newUser.role">
+
+          <option value="super_admin">
+            Super Admin
+          </option>
+
+          <option value="store_manager">
+            Store Manager
+          </option>
+
+          <option value="kitchen_staff">
+            Kitchen Staff
+          </option>
+
+          <option value="accountant">
+            Accountant
+          </option>
+
+        </select>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Outlet</label>
+
+        <select [(ngModel)]="newUser.outletId">
+
+          <option [ngValue]="null">
+
+            Select Outlet
+
+          </option>
+
+          <option
+            *ngFor="let outlet of outlets"
+            [ngValue]="outlet.id">
+
+            {{ outlet.name }}
+
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <div class="form-buttons">
+
+      <button
+        class="btn-primary"
+        (click)="saveUser()">
+
+        {{ editing ? 'Update User' : 'Create User' }}
+
+      </button>
+
+      <button
+        class="btn-secondary"
+        (click)="showAddForm=false">
+
+        Cancel
+
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- USERS TABLE -->
+
+  <div class="table-card">
+
+    <table *ngIf="users.length > 0">
+
+      <thead>
+
+        <tr>
+
+          <th>Full Name</th>
+
+          <th>Email</th>
+
+          <th>Role</th>
+
+          <th>Outlet</th>
+
+          <th>Status</th>
+
+          <th>Actions</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr *ngFor="let user of users">
+
+          <td>
+
+            {{ user.fullName }}
+
+          </td>
+
+          <td>
+
+            {{ user.email }}
+
+          </td>
+
+          <td>
+
+            <span
+              class="role-badge"
+              [ngClass]="user.role">
+
+              {{ user.role.replace('_',' ') }}
+
+            </span>
+
+          </td>
+
+          <td>
+
+            {{ user.outletName || '-' }}
+
+          </td>
+
+          <td>
+
+            <span
+              class="status-badge"
+              [ngClass]="user.isActive ? 'active' : 'inactive'">
+
+              {{ user.isActive ? 'Active' : 'Inactive' }}
+
+            </span>
+
+          </td>
+
+          <td class="actions">
+
+            <button
+              class="btn-edit"
+              (click)="editUser(user)">
+
+              Edit
+
+            </button>
+
+            <button
+              class="btn-reset"
+              (click)="resetPassword(user)">
+
+              Reset Password
+
+            </button>
+
+            <button
+              class="btn-delete"
+              (click)="deleteUser(user)">
+
+              Delete
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <div
+      class="empty-state"
+      *ngIf="users.length === 0">
+
+      <h3>No Users Found</h3>
+
+      <p>
+
+        Click the "New User" button to create your first user.
+
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+```

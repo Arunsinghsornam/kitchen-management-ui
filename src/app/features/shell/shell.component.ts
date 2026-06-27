@@ -1,39 +1,108 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive
+  ],
   template: `
     <div class="shell">
+
       <div class="sidenav">
+
         <div class="brand">
           <span class="brand-icon">🍞</span>
+
           <div>
             <div class="brand-name">Pav Republic</div>
-            <div class="brand-sub">Main Outlet · Bengaluru</div>
+            <div class="brand-sub">
+              Welcome, {{ auth.getFullName() }}
+            </div>
           </div>
         </div>
+
         <nav>
-          <a routerLink="/dashboard" routerLinkActive="active">📊 Dashboard</a>
-          <a routerLink="/inventory" routerLinkActive="active">📦 Inventory</a>
-          <a routerLink="/suppliers" routerLinkActive="active">🚚 Suppliers</a>
-          <a routerLink="/purchases" routerLinkActive="active">🛒 Purchases</a>
-          <a routerLink="/recipes" routerLinkActive="active">📖 Recipes</a>
-          <a routerLink="/sales" routerLinkActive="active">🧾 Sales</a>
-           <a routerLink="/pl-report" routerLinkActive="active">📈 P&L Report</a>
+
+          <!-- Everyone -->
+          <a routerLink="/dashboard" routerLinkActive="active">
+            📊 Dashboard
+          </a>
+
+          <!-- Inventory -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
+            routerLink="/inventory"
+            routerLinkActive="active">
+            📦 Inventory
+          </a>
+
+          <!-- Suppliers -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            routerLink="/suppliers"
+            routerLinkActive="active">
+            🚚 Suppliers
+          </a>
+
+          <!-- Purchases -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            routerLink="/purchases"
+            routerLinkActive="active">
+            🛒 Purchases
+          </a>
+
+          <!-- Recipes -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
+            routerLink="/recipes"
+            routerLinkActive="active">
+            📖 Recipes
+          </a>
+
+          <!-- Sales -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            routerLink="/sales"
+            routerLinkActive="active">
+            🧾 Sales
+          </a>
+
+          <!-- User Management -->
+          <a
+            *ngIf="auth.isSuperAdmin()"
+            routerLink="/users"
+            routerLinkActive="active">
+            👥 User Management
+          </a>
+
+          <!-- P&L -->
+          <a
+            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isAccountant()"
+            routerLink="/pl-report"
+            routerLinkActive="active">
+            📈 P&L Report
+          </a>
+
         </nav>
+
         <div class="signout">
           <button (click)="logout()">Sign Out</button>
         </div>
+
       </div>
+
       <div class="main-content">
-        <router-outlet />
+        <router-outlet></router-outlet>
       </div>
+
     </div>
   `,
   styles: [`
@@ -71,7 +140,7 @@ import { Router } from '@angular/router';
 
 .brand-sub{
   font-size:12px;
-  color:rgba(255,255,255,.65);
+  color:rgba(255,255,255,.7);
 }
 
 nav{
@@ -84,12 +153,11 @@ nav a{
   align-items:center;
   gap:10px;
   text-decoration:none;
-  color:rgba(255,255,255,.85);
+  color:white;
   padding:14px 16px;
   margin-bottom:8px;
   border-radius:12px;
   transition:.2s;
-  font-size:15px;
 }
 
 nav a:hover{
@@ -98,7 +166,6 @@ nav a:hover{
 
 nav a.active{
   background:#ff6b00;
-  color:white;
 }
 
 .signout{
@@ -111,26 +178,28 @@ nav a.active{
   height:48px;
   border:none;
   border-radius:12px;
+  cursor:pointer;
   background:rgba(255,255,255,.08);
   color:white;
-  cursor:pointer;
 }
 
 .main-content{
   flex:1;
-  overflow-y:auto;
+  overflow:auto;
   padding:32px;
-  background:#f5f3ef;
 }
 `]
 })
 export class ShellComponent {
+
   constructor(
-  private auth: AuthService,
-  private router: Router
-) {}
+    public auth: AuthService,
+    private router: Router
+  ) {}
+
   logout() {
-  this.auth.logout();
-  this.router.navigate(['/login']);
-}
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
 }
