@@ -1,7 +1,9 @@
-﻿import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventoryService } from './inventory.service';
+import { AuthService } from '../../services/auth.service';
+import { OutletService, Outlet } from '../outlets/outlet.service';
 
 @Component({
   selector: 'app-inventory',
@@ -11,15 +13,28 @@ import { InventoryService } from './inventory.service';
   template: `
     <div class="inventory-page">
 
-      <div class="page-header">
+      <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
         <div>
           <h1>Inventory</h1>
           <p>Manage raw materials and stock levels</p>
         </div>
 
-        <button class="add-btn" (click)="showAddForm = true">
-          + Add Item
-        </button>
+        <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+          <!-- Outlet Dropdown filter for Super Admin -->
+          <div *ngIf="isSuperAdmin" class="outlet-filter-box">
+            <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
+                    style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+              <option value="">-- Select Outlet --</option>
+              <option *ngFor="let outlet of outlets" [value]="outlet.id">
+                {{ outlet.name }}
+              </option>
+            </select>
+          </div>
+
+          <button class="add-btn" (click)="openAddForm()" [disabled]="isSuperAdmin && !selectedOutletId" style="opacity: (isSuperAdmin && !selectedOutletId) ? 0.6 : 1;">
+            + Add Item
+          </button>
+        </div>
       </div>
 
       <div class="inventory-card">
@@ -42,7 +57,7 @@ import { InventoryService } from './inventory.service';
                 <strong>{{ item.name }}</strong>
               </td>
 
-              <td>{{ item.categoryName }}</td>
+              <td>{{ item.categoryName || 'N/A' }}</td>
 
               <td>{{ item.unit }}</td>
 
@@ -52,6 +67,12 @@ import { InventoryService } from './inventory.service';
                   [class.low-stock]="item.currentStock <= item.reorderLevel">
                   {{ item.currentStock }}
                 </span>
+              </td>
+            </tr>
+
+            <tr *ngIf="items.length === 0">
+              <td colspan="5" style="text-align: center; color: #777; padding: 20px;">
+                {{ (isSuperAdmin && !selectedOutletId) ? 'Please select an outlet to view inventory.' : 'No inventory items found.' }}
               </td>
             </tr>
           </tbody>
@@ -65,6 +86,16 @@ import { InventoryService } from './inventory.service';
           <h2>New Raw Material</h2>
 
           <div class="form-grid">
+
+            <div class="form-group" *ngIf="isSuperAdmin">
+              <label>Outlet</label>
+              <select [(ngModel)]="newItem.outletId" (change)="onModalOutletChange()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                <option value="">-- Select Outlet --</option>
+                <option *ngFor="let outlet of outlets" [value]="outlet.id">
+                  {{ outlet.name }}
+                </option>
+              </select>
+            </div>
 
             <div class="form-group">
               <label>Item Code</label>
@@ -134,6 +165,8 @@ import { InventoryService } from './inventory.service';
   styles: [`
     .inventory-page{
       padding:32px;
+      background:#f7f4ef;
+      min-height:100vh;
     }
 
     .page-header{
@@ -271,12 +304,21 @@ import { InventoryService } from './inventory.service';
 })
 export class InventoryComponent implements OnInit {
 
+  private inventoryService = inject(InventoryService);
+  private authService = inject(AuthService);
+  private outletService = inject(OutletService);
+
   items: any[] = [];
   categories: any[] = [];
+  outlets: Outlet[] = [];
+
+  isSuperAdmin = false;
+  selectedOutletId = '';
 
   showAddForm = false;
 
   newItem: any = {
+    outletId: '',
     code: '',
     name: '',
     unit: 'Kg',
@@ -284,17 +326,35 @@ export class InventoryComponent implements OnInit {
     categoryId: null
   };
 
-  constructor(
-    private inventoryService: InventoryService
-  ) {}
-
   ngOnInit(): void {
-    this.loadInventory();
-    this.loadCategories();
+    const user = this.authService.currentUser;
+    this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+
+    if (this.isSuperAdmin) {
+      this.loadOutlets();
+    } else {
+      this.selectedOutletId = user?.outletId || '';
+      this.loadInventory();
+      this.loadCategories();
+    }
+  }
+
+  loadOutlets(): void {
+    this.outletService.getOutlets().subscribe({
+      next: (data) => {
+        this.outlets = data;
+      },
+      error: (err) => console.error('Error loading outlets:', err)
+    });
   }
 
   loadInventory(): void {
-    this.inventoryService.getAll().subscribe({
+    if (this.isSuperAdmin && !this.selectedOutletId) {
+      this.items = [];
+      return;
+    }
+
+    this.inventoryService.getAll(this.selectedOutletId).subscribe({
       next: (data) => {
         this.items = data;
       },
@@ -304,8 +364,14 @@ export class InventoryComponent implements OnInit {
     });
   }
 
-  loadCategories(): void {
-    this.inventoryService.getCategories().subscribe({
+  loadCategories(targetOutletId?: string): void {
+    const outletId = targetOutletId || this.selectedOutletId;
+    if (this.isSuperAdmin && !outletId) {
+      this.categories = [];
+      return;
+    }
+
+    this.inventoryService.getCategories(outletId).subscribe({
       next: (data) => {
         this.categories = data;
       },
@@ -315,27 +381,59 @@ export class InventoryComponent implements OnInit {
     });
   }
 
+  onOutletFilterChange(): void {
+    this.loadInventory();
+    this.loadCategories();
+  }
+
+  onModalOutletChange(): void {
+    this.loadCategories(this.newItem.outletId);
+  }
+
+  openAddForm(): void {
+    if (this.isSuperAdmin && !this.selectedOutletId) {
+      alert('Please select an outlet first.');
+      return;
+    }
+
+    const user = this.authService.currentUser;
+
+    this.newItem = {
+      outletId: this.isSuperAdmin ? this.selectedOutletId : (user?.outletId || ''),
+      code: '',
+      name: '',
+      unit: 'Kg',
+      reorderLevel: 0,
+      categoryId: null
+    };
+
+    if (this.isSuperAdmin) {
+      this.onModalOutletChange();
+    }
+
+    this.showAddForm = true;
+  }
+
   saveItem(): void {
+    if (!this.newItem.outletId) {
+      alert('Please select an outlet.');
+      return;
+    }
+
+    if (!this.newItem.name?.trim()) {
+      alert('Item name is required.');
+      return;
+    }
+
     this.inventoryService.create(this.newItem).subscribe({
       next: () => {
         alert('Raw Material Added');
-
         this.showAddForm = false;
-
-        this.newItem = {
-          code: '',
-          name: '',
-          unit: 'Kg',
-          reorderLevel: 0,
-          categoryId: null
-        };
-
         this.loadInventory();
       },
-
       error: (err) => {
         console.error(err);
-        alert('Failed to save');
+        alert(err?.error?.message ?? 'Failed to save raw material');
       }
     });
   }

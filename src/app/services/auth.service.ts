@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface LoginRequest {
   email: string;
@@ -20,6 +20,8 @@ export interface LoginResponse {
     fullName: string;
     role: string;
     outletId: string;
+    organizationId?: string;
+    organizationName?: string;
   };
 }
 
@@ -91,4 +93,31 @@ export class AuthService {
 
   }
 
+  getOrganizationName(): string {
+    return this.currentUser?.organizationName ?? 'Pav Republic';
+  }
+
+  getOutletId(): string {
+    return this.currentUser?.outletId ?? '';
+  }
+
+  isSuperAdmin(): boolean {
+    return this.currentUser?.role === 'super_admin';
+  }
+
+  isPowerAdmin(): boolean {
+    return this.currentUser?.role === 'power_admin';
+  }
+
+  isStoreManager(): boolean {
+    return this.currentUser?.role === 'store_manager';
+  }
+
+  isKitchenStaff(): boolean {
+    return this.currentUser?.role === 'kitchen_staff';
+  }
+
+  isAccountant(): boolean {
+    return this.currentUser?.role === 'accountant';
+  }
 }

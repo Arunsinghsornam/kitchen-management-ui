@@ -11,7 +11,11 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  getSummary(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/summary`);
+  getSummary(outletId?: string): Observable<any> {
+    let url = `${this.apiUrl}/summary`;
+    if (outletId) {
+      url += `?outletId=${outletId}`;
+    }
+    return this.http.get<any>(url);
   }
 }

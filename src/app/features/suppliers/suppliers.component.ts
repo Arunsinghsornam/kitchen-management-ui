@@ -1,9 +1,10 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { SupplierService } from './supplier.service';
-import { OutletService } from '../Outlets/outlet.service';
+import { OutletService, Outlet } from '../outlets/outlet.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-suppliers',
@@ -14,16 +15,29 @@ import { OutletService } from '../Outlets/outlet.service';
 
 <div class="page">
 
-  <div class="header">
+  <div class="header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
 
     <div>
       <h2>Suppliers</h2>
       <p>Manage supplier information</p>
     </div>
 
-    <button class="add-btn" (click)="newSupplier()">
-      + Add Supplier
-    </button>
+    <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+      <!-- Outlet Dropdown filter for Super Admin -->
+      <div *ngIf="isSuperAdmin" class="outlet-filter-box">
+        <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+          <option value="">All Outlets</option>
+          <option *ngFor="let outlet of outlets" [value]="outlet.id">
+            {{ outlet.name }}
+          </option>
+        </select>
+      </div>
+
+      <button class="add-btn" (click)="newSupplier()">
+        + Add Supplier
+      </button>
+    </div>
 
   </div>
 
@@ -49,6 +63,7 @@ import { OutletService } from '../Outlets/outlet.service';
 
   </div>
 
+  <!-- FORM -->
   <div *ngIf="showForm" class="supplier-form">
 
     <h3>
@@ -57,76 +72,47 @@ import { OutletService } from '../Outlets/outlet.service';
 
     <div class="form-grid">
 
-      <select [(ngModel)]="supplier.outletId">
-
+      <!-- Outlet Select (Visible only to Super Admin) -->
+      <select *ngIf="isSuperAdmin" [(ngModel)]="supplier.outletId" style="grid-column: span 2;">
         <option value="">
           Select Outlet
         </option>
-
         <option
           *ngFor="let outlet of outlets"
-          [ngValue]="outlet.id">
-
+          [value]="outlet.id">
           {{ outlet.name }}
-
         </option>
-
       </select>
 
-      <input
-        [(ngModel)]="supplier.name"
-        placeholder="Supplier Name">
-
-      <input
-        [(ngModel)]="supplier.contactPerson"
-        placeholder="Contact Person">
-
-      <input
-        [(ngModel)]="supplier.mobile"
-        placeholder="Mobile">
-
-      <input
-        [(ngModel)]="supplier.gstNumber"
-        placeholder="GST Number">
-
-      <input
-        [(ngModel)]="supplier.email"
-        placeholder="Email">
-
-      <input
-        [(ngModel)]="supplier.address"
-        placeholder="Address">
+      <input [(ngModel)]="supplier.name" placeholder="Supplier Name">
+      <input [(ngModel)]="supplier.contactPerson" placeholder="Contact Person">
+      <input [(ngModel)]="supplier.mobile" placeholder="Mobile">
+      <input [(ngModel)]="supplier.gstNumber" placeholder="GST Number">
+      <input [(ngModel)]="supplier.email" placeholder="Email">
+      <input [(ngModel)]="supplier.address" placeholder="Address">
 
     </div>
 
     <div class="actions">
 
-      <button
-        class="save-btn"
-        (click)="save()">
-
+      <button class="save-btn" (click)="save()">
         Save
-
       </button>
 
-      <button
-        class="cancel-btn"
-        (click)="showForm=false">
-
+      <button class="cancel-btn" (click)="showForm=false">
         Cancel
-
       </button>
 
     </div>
 
   </div>
 
+  <!-- TABLE -->
   <div class="table-card">
 
     <table>
 
       <thead>
-
         <tr>
           <th>Outlet</th>
           <th>Name</th>
@@ -135,7 +121,6 @@ import { OutletService } from '../Outlets/outlet.service';
           <th>Email</th>
           <th>Actions</th>
         </tr>
-
       </thead>
 
       <tbody>
@@ -143,39 +128,19 @@ import { OutletService } from '../Outlets/outlet.service';
         <tr *ngFor="let s of filteredSuppliers()">
 
           <td>{{ s.outlet?.name || 'N/A' }}</td>
-
-  <td>{{ s.name }}</td>
-
-  <td>{{ s.contactPerson }}</td>
-
-  <td>{{ s.mobile }}</td>
-
-  <td>{{ s.email }}</td>
-
-  <td>
-
-   
-
-  </td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.contactPerson }}</td>
+          <td>{{ s.mobile }}</td>
+          <td>{{ s.email }}</td>
 
           <td>
-
-            <button
-              class="edit-btn"
-              (click)="edit(s)">
-
+            <button class="edit-btn" (click)="edit(s)">
               Edit
-
             </button>
 
-            <button
-              class="delete-btn"
-              (click)="remove(s.id)">
-
+            <button class="delete-btn" (click)="remove(s.id)">
               Delete
-
             </button>
-
           </td>
 
         </tr>
@@ -188,7 +153,7 @@ import { OutletService } from '../Outlets/outlet.service';
 
 </div>
 
-`,
+  `,
 
   styles: [`
 
@@ -249,20 +214,22 @@ import { OutletService } from '../Outlets/outlet.service';
 }
 
 .search-box{
-   margin:20px 0;
+  margin:20px 0;
 }
 
 .search-box input{
-   width:350px;
+  width:350px;
   padding:12px;
   border:1px solid #ddd;
   border-radius:10px;
   font-size:14px;
   outline:none;
 }
+
 .search-box input:focus{
   border-color:#ff6b35;
 }
+
 .supplier-form{
   background:#fff;
   padding:20px;
@@ -357,10 +324,13 @@ export class SuppliersComponent implements OnInit {
 
   private supplierService = inject(SupplierService);
   private outletService = inject(OutletService);
+  private authService = inject(AuthService);
 
   suppliers: any[] = [];
-  outlets: any[] = [];
+  outlets: Outlet[] = [];
 
+  isSuperAdmin = false;
+  selectedOutletId = '';
   searchText = '';
 
   showForm = false;
@@ -373,12 +343,20 @@ export class SuppliersComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.authService.currentUser;
+    this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+
+    if (this.isSuperAdmin) {
+      this.loadOutlets();
+    } else {
+      this.selectedOutletId = user?.outletId || '';
+    }
+
     this.loadSuppliers();
-    this.loadOutlets();
   }
 
   loadSuppliers(): void {
-    this.supplierService.getSuppliers().subscribe({
+    this.supplierService.getSuppliers(this.selectedOutletId).subscribe({
       next: data => this.suppliers = data,
       error: err => console.error(err)
     });
@@ -391,13 +369,19 @@ export class SuppliersComponent implements OnInit {
     });
   }
 
+  onOutletFilterChange(): void {
+    this.loadSuppliers();
+  }
+
   newSupplier(): void {
     this.editing = false;
     this.showForm = true;
 
+    const user = this.authService.currentUser;
+
     this.supplier = {
       id: '',
-      outletId: '',
+      outletId: this.isSuperAdmin ? (this.selectedOutletId || '') : (user?.outletId || ''),
       name: '',
       contactPerson: '',
       mobile: '',
@@ -410,27 +394,65 @@ export class SuppliersComponent implements OnInit {
   edit(item: any): void {
     this.editing = true;
     this.showForm = true;
-    this.supplier = { ...item };
+
+    this.supplier = {
+      id: item.id,
+      outletId: item.outletId,
+      name: item.name,
+      contactPerson: item.contactPerson,
+      mobile: item.mobile,
+      gstNumber: item.gstNumber,
+      email: item.email,
+      address: item.address
+    };
   }
 
   save(): void {
-    // keep your existing save logic here
+    if (!this.supplier.outletId) {
+      alert('Please select an outlet.');
+      return;
+    }
+
+    if (!this.supplier.name?.trim()) {
+      alert('Supplier name is required.');
+      return;
+    }
+
+    if (this.editing) {
+      this.supplierService.updateSupplier(this.supplier).subscribe({
+        next: () => {
+          this.loadSuppliers();
+          this.showForm = false;
+        },
+        error: err => console.error(err)
+      });
+    } else {
+      this.supplierService.createSupplier(this.supplier).subscribe({
+        next: () => {
+          this.loadSuppliers();
+          this.showForm = false;
+        },
+        error: err => console.error(err)
+      });
+    }
   }
 
   remove(id: string): void {
-    // keep your existing delete logic here
+    if (!confirm('Are you sure you want to delete this supplier?')) {
+      return;
+    }
+
+    this.supplierService.deleteSupplier(id).subscribe({
+      next: () => this.loadSuppliers(),
+      error: err => console.error(err)
+    });
   }
 
   filteredSuppliers(): any[] {
-
-    if (!this.searchText) {
-      return this.suppliers;
-    }
+    if (!this.searchText) return this.suppliers;
 
     return this.suppliers.filter(x =>
-      (x.name || '')
-        .toLowerCase()
-        .includes(this.searchText.toLowerCase())
+      (x.name || '').toLowerCase().includes(this.searchText.toLowerCase())
     );
   }
 }

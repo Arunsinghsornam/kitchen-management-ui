@@ -1,0 +1,86 @@
+<div class="category-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h2>📂 Category Management</h2>
+      <p>Manage raw material categories by outlet.</p>
+    </div>
+
+    <button class="btn-primary" (click)="openAddForm()" *ngIf="!showForm">
+      ➕ Add Category
+    </button>
+  </div>
+
+  <!-- Form Card -->
+  <div class="category-card" *ngIf="showForm">
+    <h3>{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h3>
+    
+    <div class="form-row">
+      <div class="form-group" *ngIf="isSuperAdmin">
+        <label>Outlet</label>
+        <select [(ngModel)]="category.outletId">
+          <option value="">-- Select Outlet --</option>
+          <option *ngFor="let outlet of outlets" [value]="outlet.id">
+            {{ outlet.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Category Name</label>
+        <input type="text"
+               [(ngModel)]="category.name"
+               placeholder="Enter Category Name">
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top: 20px;">
+      <button class="btn-primary" (click)="saveCategory()">
+        {{ isEditMode ? '💾 Update' : '💾 Save' }}
+      </button>
+      <button class="btn-secondary" (click)="resetForm()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <h3>Category List</h3>
+    
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th width="70">S.No</th>
+          <th>Outlet</th>
+          <th>Category Name</th>
+          <th width="180">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of filteredCategories(); let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ c.outlet?.name || 'N/A' }}</td>
+          <td>{{ c.name }}</td>
+          <td>
+            <button class="action-btn edit-btn" (click)="editCategory(c)">
+              ✏ Edit
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteCategory(c.id!)">
+              🗑 Delete
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredCategories().length === 0">
+          <td colspan="4" style="text-align:center; color:#777;">
+            No categories found.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

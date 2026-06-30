@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { UserService, User, CreateUser } from './user.service';
-import { OutletService, Outlet } from '../Outlets/outlet.service';
+import { OutletService, Outlet } from '../outlets/outlet.service';
 
 @Component({
   selector: 'app-users',
