@@ -6,6 +6,8 @@ import { SalesService } from './sales.service';
 import { MenuItemService } from '../recipes/menu-item.service';
 import { AuthService } from '../../services/auth.service';
 import { OutletService, Outlet } from '../outlets/outlet.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -20,13 +22,18 @@ export class SalesComponent implements OnInit {
   private menuService = inject(MenuItemService);
   private authService = inject(AuthService);
   private outletService = inject(OutletService);
+  private http = inject(HttpClient);
 
   sales: any[] = [];
   menuItems: any[] = [];
+  organizations: any[] = [];
 
   isSuperAdmin = false;
+  isPowerAdmin = false;
   outlets: Outlet[] = [];
   selectedOutletId = '';
+  selectedOrganizationId = '';
+  modalOrganizationId = '';
 
   showModal = false;
 
@@ -40,28 +47,47 @@ export class SalesComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUser;
     this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+    this.isPowerAdmin = user?.role === 'power_admin';
 
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
     if (this.isSuperAdmin) {
       this.loadOutlets();
     } else {
       this.selectedOutletId = user?.outletId || '';
+      this.loadSales();
+      this.loadMenuItems(this.selectedOutletId);
     }
+  }
 
-    this.loadSales();
-    this.loadMenuItems();
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
   }
 
   loadOutlets(): void {
-    this.outletService.getOutlets().subscribe({
+    this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
       next: (data) => {
         this.outlets = data;
+        if (this.outlets.length > 0 && !this.selectedOutletId) {
+          this.selectedOutletId = this.outlets[0].id || '';
+          this.loadSales();
+          this.loadMenuItems(this.selectedOutletId);
+        }
       },
       error: (err) => console.error('Error loading outlets:', err)
     });
   }
 
   loadSales(): void {
-    this.salesService.getSales(this.selectedOutletId).subscribe({
+    this.salesService.getSales(this.selectedOutletId, this.selectedOrganizationId).subscribe({
       next: (res) => {
         this.sales = res;
       },
@@ -71,8 +97,12 @@ export class SalesComponent implements OnInit {
     });
   }
 
-  loadMenuItems(): void {
-    this.menuService.getMenuItems().subscribe({
+  loadMenuItems(outletId?: string): void {
+    if (this.isSuperAdmin && !outletId) {
+      this.menuItems = [];
+      return;
+    }
+    this.menuService.getMenuItems(outletId).subscribe({
       next: (res) => {
         this.menuItems = res;
       },
@@ -84,6 +114,28 @@ export class SalesComponent implements OnInit {
 
   onOutletFilterChange(): void {
     this.loadSales();
+    this.loadMenuItems(this.selectedOutletId);
+  }
+
+  onOrganizationChange(): void {
+    this.selectedOutletId = '';
+    this.loadOutlets();
+    this.loadSales();
+    this.menuItems = [];
+  }
+
+  onModalOrganizationChange(): void {
+    this.sale.outletId = '';
+    this.outletService.getOutlets(this.modalOrganizationId).subscribe({
+      next: data => this.outlets = data,
+      error: err => console.error(err)
+    });
+  }
+
+  onModalOutletChange(): void {
+    this.loadMenuItems(this.sale.outletId);
+    this.sale.items = []; // Clear current items since they belong to the previous outlet's menu items
+    this.addItem();
   }
 
   newSale(): void {
@@ -94,6 +146,7 @@ export class SalesComponent implements OnInit {
       items: []
     };
 
+    this.loadMenuItems(this.sale.outletId);
     this.addItem();
 
     this.showModal = true;

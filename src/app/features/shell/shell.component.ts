@@ -18,7 +18,10 @@ import { AuthService } from '../../core/auth/auth.service';
       <div class="sidenav">
 
         <div class="brand">
-          <span class="brand-icon">🍞</span>
+          <div class="brand-logo-box" style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <img *ngIf="auth.getLogoUrl()" [src]="auth.getLogoUrl()" style="width: 100%; height: 100%; object-fit: cover;" />
+            <span *ngIf="!auth.getLogoUrl()" class="brand-icon" style="font-size: 24px;">🍞</span>
+          </div>
 
           <div>
             <div class="brand-name">{{ auth.getOrganizationName() }}</div>
@@ -104,6 +107,14 @@ import { AuthService } from '../../core/auth/auth.service';
             routerLink="/pl-report"
             routerLinkActive="active">
             📈 P&L Report
+          </a>
+
+          <!-- Approvals (Power Admin Only) -->
+          <a
+            *ngIf="auth.isPowerAdmin()"
+            routerLink="/approvals"
+            routerLinkActive="active">
+            ⏳ Approvals
           </a>
 
         </nav>

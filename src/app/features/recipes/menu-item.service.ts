@@ -10,7 +10,11 @@ private http = inject(HttpClient);
 
 private apiUrl = 'http://localhost:5253/api/Recipes';
 
-getMenuItems() {
-return this.http.get<any[]>(this.apiUrl);
-}
+  getMenuItems(outletId?: string) {
+    let url = this.apiUrl;
+    if (outletId) {
+      url += `?outletId=${outletId}`;
+    }
+    return this.http.get<any[]>(url);
+  }
 }

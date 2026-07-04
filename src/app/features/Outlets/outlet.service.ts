@@ -7,6 +7,7 @@ export interface Outlet {
   name: string;
   address: string;
   active?: boolean;
+  organizationId?: string;
 }
 
 @Injectable({
@@ -19,9 +20,12 @@ export class OutletService {
   private apiUrl = 'http://localhost:5253/api/Outlets';
 
 
-  // GET ALL
-  getOutlets(): Observable<Outlet[]> {
-    return this.http.get<Outlet[]>(this.apiUrl);
+  getOutlets(organizationId?: string): Observable<Outlet[]> {
+    let url = this.apiUrl;
+    if (organizationId) {
+      url += `?organizationId=${organizationId}`;
+    }
+    return this.http.get<Outlet[]>(url);
   }
 
 

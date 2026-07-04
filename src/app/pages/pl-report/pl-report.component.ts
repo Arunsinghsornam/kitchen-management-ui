@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { PLReportService, PLReportResponse, DailyPLRow, MonthlyPLRow, ChannelPLRow } from '../../services/pl-report.service';
 import { AuthService } from '../../services/auth.service';
+import { OutletService, Outlet } from '../../features/outlets/outlet.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 type ActiveTab = 'daily' | 'monthly' | 'channel';
 
@@ -16,24 +19,31 @@ styleUrls: ['./pl-report.component.css']
 })
 export class PLReportComponent implements OnInit {
 
-private svc = inject(PLReportService);
-private auth = inject(AuthService);
+  private svc = inject(PLReportService);
+  private auth = inject(AuthService);
+  private outletService = inject(OutletService);
+  private http = inject(HttpClient);
 
-loading = signal(false);
-error = signal<string | null>(null);
-report = signal<PLReportResponse | null>(null);
+  loading = signal(false);
+  error = signal<string | null>(null);
+  report = signal<PLReportResponse | null>(null);
 
-activeTab = signal<ActiveTab>('daily');
+  activeTab = signal<ActiveTab>('daily');
 
-outletId = this.auth.currentUser?.outletId || '';
+  outletId = '';
+  selectedOrganizationId = '';
+  isSuperAdmin = false;
+  isPowerAdmin = false;
+  organizations: any[] = [];
+  outlets: Outlet[] = [];
 
-dateFrom = this.formatDate(
-new Date(Date.now() - 29 * 86400000)
-);
+  dateFrom = this.formatDate(
+    new Date(Date.now() - 29 * 86400000)
+  );
 
-dateTo = this.formatDate(
-new Date()
-);
+  dateTo = this.formatDate(
+    new Date()
+  );
 
 summaryCards = computed(() => {
   const r = this.report();
@@ -69,16 +79,65 @@ summaryCards = computed(() => {
   ];
 });
 
-ngOnInit(): void {
-this.load();
-}
+  ngOnInit(): void {
+    const user = this.auth.currentUser;
+    this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+    this.isPowerAdmin = user?.role === 'power_admin';
 
-load(): void {
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
 
+    if (this.isSuperAdmin) {
+      this.loadOutlets();
+    } else {
+      this.outletId = user?.outletId || '';
+      this.load();
+    }
+  }
 
-if (!this.dateFrom || !this.dateTo) {
-  return;
-}
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
+  }
+
+  loadOutlets(): void {
+    this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
+      next: (data) => {
+        this.outlets = data;
+        if (this.outlets.length > 0 && !this.outletId) {
+          this.outletId = this.outlets[0].id || '';
+          this.load();
+        }
+      },
+      error: (err) => console.error('Error loading outlets:', err)
+    });
+  }
+
+  onOrganizationChange(): void {
+    this.outletId = '';
+    this.loadOutlets();
+    this.report.set(null);
+  }
+
+  onOutletChange(): void {
+    this.load();
+  }
+
+  load(): void {
+    if (!this.outletId) {
+      return;
+    }
+
+    if (!this.dateFrom || !this.dateTo) {
+      return;
+    }
 
 this.loading.set(true);
 this.error.set(null);

@@ -15,7 +15,31 @@
 
   <!-- ── Filter Bar ───────────────────────────────────────────── -->
  <div class="filter-card">
-    <div class="filter-row">
+    <div class="filter-row" style="display: flex; align-items: center; flex-wrap: wrap; gap: 15px;">
+
+      <!-- Organization filter for Power Admin -->
+      <div class="filter-group" *ngIf="isPowerAdmin">
+        <label class="text-xs font-medium text-gray-600">Organization</label>
+        <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()"
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+          <option value="">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Outlet filter for Super Admin / Power Admin -->
+      <div class="filter-group" *ngIf="isSuperAdmin">
+        <label class="text-xs font-medium text-gray-600">Outlet</label>
+        <select [(ngModel)]="outletId" (change)="onOutletChange()"
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+          <option value="">-- Select Outlet --</option>
+          <option *ngFor="let outlet of outlets" [value]="outlet.id">
+            {{ outlet.name }}
+          </option>
+        </select>
+      </div>
 
       <!-- Date From -->
       <div class="filter-group">

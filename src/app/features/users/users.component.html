@@ -20,11 +20,22 @@
   </div>
 
   <!-- SEARCH BAR -->
-  <div class="toolbar">
+  <div class="toolbar" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
 
     <input
       type="text"
       placeholder="Search users..." />
+
+    <!-- Organization Dropdown filter for Power Admin -->
+    <div *ngIf="isPowerAdmin" class="org-filter-box" style="margin-left: auto;">
+      <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 200px; font-weight: 600;">
+        <option value="">All Organizations</option>
+        <option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+    </div>
 
   </div>
 
@@ -58,7 +69,7 @@
         <input
           type="email"
           [(ngModel)]="newUser.email"
-          [disabled]="editing">
+          [disabled]="editing && !isPowerAdmin">
 
       </div>
 
@@ -80,7 +91,7 @@
 
         <select [(ngModel)]="newUser.role">
 
-          <option value="super_admin">
+          <option value="super_admin" *ngIf="isPowerAdmin">
             Super Admin
           </option>
 
@@ -239,11 +250,10 @@
             </button>
 
             <button
+              *ngIf="user.id !== currentUserId && (isPowerAdmin || user.role !== 'super_admin')"
               class="btn-delete"
               (click)="deleteUser(user)">
-
               Delete
-
             </button>
 
           </td>

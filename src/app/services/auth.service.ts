@@ -22,6 +22,7 @@ export interface LoginResponse {
     outletId: string;
     organizationId?: string;
     organizationName?: string;
+    logoUrl?: string;
   };
 }
 
@@ -119,5 +120,22 @@ export class AuthService {
 
   isAccountant(): boolean {
     return this.currentUser?.role === 'accountant';
+  }
+
+  getFullName(): string {
+    return this.currentUser?.fullName ?? '';
+  }
+
+  getOrganizationId(): string {
+    return this.currentUser?.organizationId ?? '';
+  }
+
+  getLogoUrl(): string {
+    const logo = this.currentUser?.logoUrl;
+    if (!logo) return '';
+    if (logo.startsWith('/')) {
+      return `${environment.apiUrl}${logo}`;
+    }
+    return logo;
   }
 }

@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { SupplierService } from './supplier.service';
 import { OutletService, Outlet } from '../outlets/outlet.service';
 import { AuthService } from '../../services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-suppliers',
@@ -23,6 +25,17 @@ import { AuthService } from '../../services/auth.service';
     </div>
 
     <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+      <!-- Organization Dropdown filter for Power Admin -->
+      <div *ngIf="isPowerAdmin" class="outlet-filter-box">
+        <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+          <option value="">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
       <!-- Outlet Dropdown filter for Super Admin -->
       <div *ngIf="isSuperAdmin" class="outlet-filter-box">
         <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
@@ -72,8 +85,20 @@ import { AuthService } from '../../services/auth.service';
 
     <div class="form-grid">
 
-      <!-- Outlet Select (Visible only to Super Admin) -->
-      <select *ngIf="isSuperAdmin" [(ngModel)]="supplier.outletId" style="grid-column: span 2;">
+      <!-- Organization Select (Visible only to Power Admin in Form) -->
+      <select *ngIf="isPowerAdmin" [(ngModel)]="modalOrganizationId" (change)="onModalOrganizationChange()" style="grid-column: span 2; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        <option value="">
+          Select Organization
+        </option>
+        <option
+          *ngFor="let org of organizations"
+          [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+
+      <!-- Outlet Select (Visible only to Super Admin / Power Admin) -->
+      <select *ngIf="isSuperAdmin" [(ngModel)]="supplier.outletId" style="grid-column: span 2; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
         <option value="">
           Select Outlet
         </option>
@@ -86,7 +111,7 @@ import { AuthService } from '../../services/auth.service';
 
       <input [(ngModel)]="supplier.name" placeholder="Supplier Name">
       <input [(ngModel)]="supplier.contactPerson" placeholder="Contact Person">
-      <input [(ngModel)]="supplier.mobile" placeholder="Mobile">
+      <input [(ngModel)]="supplier.mobile" placeholder="Mobile" maxlength="10" (keypress)="onlyNumbers($event)">
       <input [(ngModel)]="supplier.gstNumber" placeholder="GST Number">
       <input [(ngModel)]="supplier.email" placeholder="Email">
       <input [(ngModel)]="supplier.address" placeholder="Address">
@@ -325,12 +350,17 @@ export class SuppliersComponent implements OnInit {
   private supplierService = inject(SupplierService);
   private outletService = inject(OutletService);
   private authService = inject(AuthService);
+  private http = inject(HttpClient);
 
   suppliers: any[] = [];
   outlets: Outlet[] = [];
+  organizations: any[] = [];
 
   isSuperAdmin = false;
+  isPowerAdmin = false;
   selectedOutletId = '';
+  selectedOrganizationId = '';
+  modalOrganizationId = '';
   searchText = '';
 
   showForm = false;
@@ -345,7 +375,11 @@ export class SuppliersComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUser;
     this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+    this.isPowerAdmin = user?.role === 'power_admin';
 
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
     if (this.isSuperAdmin) {
       this.loadOutlets();
     } else {
@@ -355,15 +389,26 @@ export class SuppliersComponent implements OnInit {
     this.loadSuppliers();
   }
 
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
+  }
+
   loadSuppliers(): void {
-    this.supplierService.getSuppliers(this.selectedOutletId).subscribe({
+    this.supplierService.getSuppliers(this.selectedOutletId, this.selectedOrganizationId).subscribe({
       next: data => this.suppliers = data,
       error: err => console.error(err)
     });
   }
 
   loadOutlets(): void {
-    this.outletService.getOutlets().subscribe({
+    this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
       next: data => this.outlets = data,
       error: err => console.error(err)
     });
@@ -371,6 +416,20 @@ export class SuppliersComponent implements OnInit {
 
   onOutletFilterChange(): void {
     this.loadSuppliers();
+  }
+
+  onOrganizationChange(): void {
+    this.selectedOutletId = '';
+    this.loadOutlets();
+    this.loadSuppliers();
+  }
+
+  onModalOrganizationChange(): void {
+    this.supplier.outletId = '';
+    this.outletService.getOutlets(this.modalOrganizationId).subscribe({
+      next: data => this.outlets = data,
+      error: err => console.error(err)
+    });
   }
 
   newSupplier(): void {
@@ -418,6 +477,11 @@ export class SuppliersComponent implements OnInit {
       return;
     }
 
+    if (this.supplier.mobile && !/^\d{10}$/.test(this.supplier.mobile)) {
+      alert('Mobile number must be exactly 10 digits.');
+      return;
+    }
+
     if (this.editing) {
       this.supplierService.updateSupplier(this.supplier).subscribe({
         next: () => {
@@ -454,5 +518,14 @@ export class SuppliersComponent implements OnInit {
     return this.suppliers.filter(x =>
       (x.name || '').toLowerCase().includes(this.searchText.toLowerCase())
     );
+  }
+
+  onlyNumbers(event: any): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 }

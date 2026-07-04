@@ -7,6 +7,17 @@
   </div>
 
   <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+    <!-- Organization Dropdown filter for Power Admin -->
+    <div *ngIf="isPowerAdmin" class="outlet-filter-box">
+      <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+        <option value="">All Organizations</option>
+        <option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+    </div>
+
     <!-- Outlet Dropdown filter for Super Admin -->
     <div *ngIf="isSuperAdmin" class="outlet-filter-box">
       <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
@@ -95,10 +106,21 @@
 
   </div>
 
-  <!-- Outlet Dropdown in Form for Super Admin -->
+  <!-- Organization Dropdown in Form for Power Admin -->
+  <div class="form-group" *ngIf="isPowerAdmin" style="margin-bottom: 10px;">
+    <label>Organization</label>
+    <select [(ngModel)]="modalOrganizationId" (change)="onModalOrganizationChange()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+      <option value="">-- Select Organization --</option>
+      <option *ngFor="let org of organizations" [value]="org.id">
+        {{ org.name }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Outlet Dropdown in Form for Super Admin / Power Admin -->
   <div class="form-group" *ngIf="isSuperAdmin">
     <label>Outlet</label>
-    <select [(ngModel)]="sale.outletId" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+    <select [(ngModel)]="sale.outletId" (change)="onModalOutletChange()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
       <option value="">-- Select Outlet --</option>
       <option *ngFor="let outlet of outlets" [value]="outlet.id">
         {{ outlet.name }}

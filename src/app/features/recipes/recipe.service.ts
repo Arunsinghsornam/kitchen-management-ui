@@ -11,12 +11,20 @@ private http = inject(HttpClient);
 
 private apiUrl = 'http://localhost:5253/api/Recipes';
 
-getRecipes(): Observable<any[]> {
-return this.http.get<any[]>(this.apiUrl);
+getRecipes(outletId?: string): Observable<any[]> {
+  let url = this.apiUrl;
+  if (outletId) {
+    url += `?outletId=${outletId}`;
+  }
+  return this.http.get<any[]>(url);
 }
 
-createRecipe(data: any): Observable<any> {
-return this.http.post(this.apiUrl, data);
+createRecipe(data: any, outletId?: string): Observable<any> {
+  let url = this.apiUrl;
+  if (outletId) {
+    url += `?outletId=${outletId}`;
+  }
+  return this.http.post(url, data);
 }
 
 updateRecipe(id: string, data: any): Observable<any> {

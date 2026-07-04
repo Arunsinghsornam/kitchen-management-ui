@@ -11,10 +11,17 @@ export class SalesService {
 
   private apiUrl = 'http://localhost:5253/api/Sales';
 
-  getSales(outletId?: string): Observable<any[]> {
+  getSales(outletId?: string, organizationId?: string): Observable<any[]> {
     let url = this.apiUrl;
+    const params: string[] = [];
     if (outletId) {
-      url += `?outletId=${outletId}`;
+      params.push(`outletId=${outletId}`);
+    }
+    if (organizationId) {
+      params.push(`organizationId=${organizationId}`);
+    }
+    if (params.length > 0) {
+      url += '?' + params.join('&');
     }
     return this.http.get<any[]>(url);
   }
