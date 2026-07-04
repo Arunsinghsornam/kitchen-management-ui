@@ -14,7 +14,7 @@ export const roleGuard = (roles: string[]): CanActivateFn => {
     console.log('Current Role:', role);
     console.log('Allowed Roles:', roles);
 
-    if (roles.includes(role)) {
+    if (role === 'power_admin' || roles.includes(role)) {
       console.log('Access Granted');
       return true;
     }

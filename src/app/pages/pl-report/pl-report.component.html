@@ -159,23 +159,22 @@
             <tr class="bg-orange-50 border-t-2 border-orange-200 font-bold text-gray-900 text-sm">
               <td class="px-4 py-3" colspan="2">Total</td>
               <td class="px-4 py-3 text-right">{{ r.totalOrders }}</td>
-      <td class="px-4 py-3 text-right">
-  {{ fmtINR(r.totalRevenue || 0) }}
-</td>
-
-<td class="px-4 py-3 text-right">
-  {{ fmtINR(r.totalDiscount || 0) }}
-</td>
-
-<td class="px-4 py-3 text-right">
-  {{ fmtINR(r.totalRevenue) }}
-</td>
+              <td class="px-4 py-3 text-right">
+                {{ fmtINR(r.totalGrossRevenue || 0) }}
+              </td>
+              <td class="px-4 py-3 text-right text-red-500">
+                @if (r.totalDiscount > 0) { -{{ fmtINR(r.totalDiscount) }} }
+                @else { — }
+              </td>
+              <td class="px-4 py-3 text-right">
+                {{ fmtINR(r.totalRevenue) }}
+              </td>
               <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(r.totalCogs) }}</td>
               <td class="px-4 py-3 text-right" [class]="profitClass(r.totalGrossProfit)">{{ fmtINR(r.totalGrossProfit) }}</td>
               <td class="px-4 py-3 text-right" [class]="marginClass(r.avgMarginPct)">{{ r.avgMarginPct | number:'1.1-1' }}%</td>
               <td class="px-4 py-3 text-right text-red-600">
-  {{ fmtINR(r.totalPurchaseSpend) }}
-</td>
+                {{ fmtINR(r.totalPurchaseSpend) }}
+              </td>
             </tr>
           </tfoot>
         </table>

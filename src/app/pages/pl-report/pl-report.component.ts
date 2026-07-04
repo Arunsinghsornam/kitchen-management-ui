@@ -2,13 +2,8 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import {
-PLReportService,
-PLReportResponse,
-DailyPLRow,
-MonthlyPLRow,
-ChannelPLRow,
-} from '../../services/pl-report.service';
+import { PLReportService, PLReportResponse, DailyPLRow, MonthlyPLRow, ChannelPLRow } from '../../services/pl-report.service';
+import { AuthService } from '../../services/auth.service';
 
 type ActiveTab = 'daily' | 'monthly' | 'channel';
 
@@ -22,6 +17,7 @@ styleUrls: ['./pl-report.component.css']
 export class PLReportComponent implements OnInit {
 
 private svc = inject(PLReportService);
+private auth = inject(AuthService);
 
 loading = signal(false);
 error = signal<string | null>(null);
@@ -29,7 +25,7 @@ report = signal<PLReportResponse | null>(null);
 
 activeTab = signal<ActiveTab>('daily');
 
-outletId = '00000000-0000-0000-0000-000000000001';
+outletId = this.auth.currentUser?.outletId || '';
 
 dateFrom = this.formatDate(
 new Date(Date.now() - 29 * 86400000)

@@ -1,19 +1,36 @@
-﻿import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DashboardService } from './dashboard.service';
+import { AuthService } from '../../services/auth.service';
+import { OutletService, Outlet } from '../outlets/outlet.service';
 import { Chart } from 'chart.js/auto';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
 
   template: `
     <div class="dashboard">
 
-      <div class="page-header">
-        <h1>Dashboard</h1>
-        <p>At-a-glance view of today's operations</p>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div>
+          <h1>Dashboard</h1>
+          <p>At-a-glance view of today's operations</p>
+        </div>
+
+        <!-- Outlet Dropdown filter for Super Admin / Power Admin -->
+        <div *ngIf="showOutletFilter" class="outlet-filter-box" style="display: flex; align-items: center; gap: 10px; background: white; padding: 8px 16px; border-radius: 12px; border: 1px solid #ececec; box-shadow: 0 2px 8px rgba(0,0,0,.04);">
+          <span style="font-size: 14px; font-weight: 600; color: #777;">🏢 Outlet:</span>
+          <select [(ngModel)]="selectedOutletId" (change)="onOutletChange()" 
+                  style="border: none; background: transparent; font-size: 14px; font-weight: 600; outline: none; min-width: 150px; cursor: pointer; color: #ff6b35;">
+            <option value="">All Outlets</option>
+            <option *ngFor="let outlet of outlets" [value]="outlet.id">
+              {{ outlet.name }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="cards">
@@ -301,15 +318,43 @@ import { Chart } from 'chart.js/auto';
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
+  private dashboardService = inject(DashboardService);
+  private authService = inject(AuthService);
+  private outletService = inject(OutletService);
+
   summary: any;
   chart: Chart | null = null;
 
-  constructor(
-    private dashboardService: DashboardService
-  ) {}
+  isSuperAdmin = false;
+  showOutletFilter = false;
+  outlets: Outlet[] = [];
+  selectedOutletId = '';
 
   ngOnInit(): void {
-    this.dashboardService.getSummary().subscribe({
+    const user = this.authService.currentUser;
+    this.isSuperAdmin = user?.role === 'super_admin';
+    this.showOutletFilter = this.isSuperAdmin || user?.role === 'power_admin';
+
+    if (this.showOutletFilter) {
+      this.loadOutlets();
+    }
+
+    this.loadSummary();
+  }
+
+  ngAfterViewInit(): void {}
+
+  loadOutlets(): void {
+    this.outletService.getOutlets().subscribe({
+      next: (data) => {
+        this.outlets = data;
+      },
+      error: (err) => console.error('Error loading outlets:', err)
+    });
+  }
+
+  loadSummary(): void {
+    this.dashboardService.getSummary(this.selectedOutletId).subscribe({
       next: (data: any) => {
         this.summary = data;
 
@@ -317,14 +362,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           this.loadChart();
         }, 200);
       },
-
       error: (err: any) => {
-        console.error(err);
+        console.error('Error loading dashboard summary:', err);
       }
     });
   }
 
-  ngAfterViewInit(): void {}
+  onOutletChange(): void {
+    this.loadSummary();
+  }
 
   loadChart(): void {
 
@@ -368,21 +414,21 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       },
 
       options: {
-  responsive: true,
-  maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
 
-  scales: {
-    y: {
-      beginAtZero: true
-    }
-  },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        },
 
-  plugins: {
-    legend: {
-      display: false
-    }
-  }
-}
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
     });
   }
 }

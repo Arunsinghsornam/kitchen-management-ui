@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="login-page">
       <div class="login-card">
@@ -41,6 +41,10 @@ import { AuthService } from '../../core/auth/auth.service';
         <button class="login-btn" (click)="login()" [disabled]="loading">
           {{ loading ? 'Signing in...' : 'Sign In' }}
         </button>
+
+        <div class="register-link">
+          New here? <a routerLink="/register">Register your business</a>
+        </div>
       </div>
     </div>
   `,
@@ -144,6 +148,22 @@ import { AuthService } from '../../core/auth/auth.service';
     .login-btn:disabled {
       background: #ccc;
       cursor: not-allowed;
+    }
+
+    .register-link {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .register-link a {
+      color: #c0392b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
     }
   `]
 })

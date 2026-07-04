@@ -1,4 +1,4 @@
-﻿import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -15,6 +15,8 @@ export interface LoginResponse {
     fullName: string;
     role: string;
     outletId: string;
+    organizationId?: string;
+    organizationName?: string;
   };
 }
 
@@ -40,6 +42,21 @@ export class AuthService {
           localStorage.setItem('refresh_token', res.data.refreshToken);
           localStorage.setItem('user', JSON.stringify(res.data));
 
+        }
+      })
+    );
+  }
+
+  register(data: any): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(
+      `${this.api}/register`,
+      data
+    ).pipe(
+      tap(res => {
+        if (res.success) {
+          localStorage.setItem('access_token', res.data.accessToken);
+          localStorage.setItem('refresh_token', res.data.refreshToken);
+          localStorage.setItem('user', JSON.stringify(res.data));
         }
       })
     );
@@ -86,6 +103,18 @@ export class AuthService {
 
   isSuperAdmin(): boolean {
     return this.getRole() === 'super_admin';
+  }
+
+  isPowerAdmin(): boolean {
+    return this.getRole() === 'power_admin';
+  }
+
+  getOrganizationId(): string {
+    return this.getUser()?.organizationId ?? '';
+  }
+
+  getOrganizationName(): string {
+    return this.getUser()?.organizationName ?? 'Pav Republic';
   }
 
   isStoreManager(): boolean {

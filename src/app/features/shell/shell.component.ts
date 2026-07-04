@@ -21,7 +21,7 @@ import { AuthService } from '../../core/auth/auth.service';
           <span class="brand-icon">🍞</span>
 
           <div>
-            <div class="brand-name">Pav Republic</div>
+            <div class="brand-name">{{ auth.getOrganizationName() }}</div>
             <div class="brand-sub">
               Welcome, {{ auth.getFullName() }}
             </div>
@@ -37,7 +37,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <!-- Inventory -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
             routerLink="/inventory"
             routerLinkActive="active">
             📦 Inventory
@@ -45,7 +45,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <!-- Suppliers -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager()"
             routerLink="/suppliers"
             routerLinkActive="active">
             🚚 Suppliers
@@ -53,7 +53,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <!-- Purchases -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager()"
             routerLink="/purchases"
             routerLinkActive="active">
             🛒 Purchases
@@ -61,7 +61,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <!-- Recipes -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager() || auth.isKitchenStaff()"
             routerLink="/recipes"
             routerLinkActive="active">
             📖 Recipes
@@ -69,23 +69,38 @@ import { AuthService } from '../../core/auth/auth.service';
 
           <!-- Sales -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager()"
             routerLink="/sales"
             routerLinkActive="active">
             🧾 Sales
           </a>
+  <!-- Outlets -->
+<a
+  *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin()"
+  routerLink="/outlets"
+  routerLinkActive="active">
+  🏢 Outlets
+</a>
 
-          <!-- User Management -->
-          <a
-            *ngIf="auth.isSuperAdmin()"
-            routerLink="/users"
-            routerLinkActive="active">
-            👥 User Management
-          </a>
+<!-- Categories -->
+<a
+  *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager()"
+  routerLink="/categories"
+  routerLinkActive="active">
+  📂 Categories
+</a>
+
+<!-- User Management -->
+<a
+  *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin()"
+  routerLink="/users"
+  routerLinkActive="active">
+  👥 User Management
+</a>
 
           <!-- P&L -->
           <a
-            *ngIf="auth.isSuperAdmin() || auth.isStoreManager() || auth.isAccountant()"
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager() || auth.isAccountant()"
             routerLink="/pl-report"
             routerLinkActive="active">
             📈 P&L Report

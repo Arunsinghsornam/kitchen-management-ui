@@ -1,0 +1,295 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\suppliers.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\suppliers\\suppliers.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\supplier.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\suppliers\\supplier.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\inventory\\inventory.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\raw-material.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\inventory\\raw-material.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\inventory\\inventory.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\category\\category.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\category\\category.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\category\\category.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\shell\\shell.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\shell\\shell.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\category\\category.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\users\\users.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\outlets\\outlet.component.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\outlets\\outlet.component.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\outlets\\outlet.service.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\app.routes.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\app.routes.ts||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\outlets\\outlet.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\features\\users\\users.component.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "supplier.service.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\supplier.service.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\suppliers\\supplier.service.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\supplier.service.ts",
+              "RelativeToolTip": "src\\app\\features\\suppliers\\supplier.service.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAIwCYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T13:14:16.922Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "inventory.service.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.service.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\inventory\\inventory.service.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.service.ts",
+              "RelativeToolTip": "src\\app\\features\\inventory\\inventory.service.ts",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAIwAwAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T12:35:13.854Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "shell.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\shell\\shell.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\shell\\shell.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\shell\\shell.component.ts",
+              "RelativeToolTip": "src\\app\\features\\shell\\shell.component.ts",
+              "ViewState": "AgIAAFoAAAAAAAAAAAAIwGIAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:56:43.05Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "suppliers.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\suppliers.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\suppliers\\suppliers.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\suppliers\\suppliers.component.ts",
+              "RelativeToolTip": "src\\app\\features\\suppliers\\suppliers.component.ts",
+              "ViewState": "AgIAAHkBAAAAAAAAAAASwIEBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:44:08.75Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "inventory.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\inventory\\inventory.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\inventory.component.ts",
+              "RelativeToolTip": "src\\app\\features\\inventory\\inventory.component.ts",
+              "ViewState": "AgIAAEkBAAAAAAAAAAAcwFUBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T12:34:31.385Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "raw-material.service.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\raw-material.service.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\inventory\\raw-material.service.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\inventory\\raw-material.service.ts",
+              "RelativeToolTip": "src\\app\\features\\inventory\\raw-material.service.ts",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAUwBAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T12:35:28.803Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "category.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\category\\category.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.ts",
+              "RelativeToolTip": "src\\app\\features\\category\\category.component.ts",
+              "ViewState": "AgIAAJQAAAAAAAAAAAAIwJ0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:29:41.964Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "category.service.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.service.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\category\\category.service.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.service.ts",
+              "RelativeToolTip": "src\\app\\features\\category\\category.service.ts",
+              "ViewState": "AgIAACQAAAAAAAAAAAAcwDAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:30:24.042Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "category.component.html",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.html",
+              "RelativeDocumentMoniker": "src\\app\\features\\category\\category.component.html",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.html",
+              "RelativeToolTip": "src\\app\\features\\category\\category.component.html",
+              "ViewState": "AgIAAIwAAAAAAAAAAAAqwJcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-06-29T10:29:52.383Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "category.component.css",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.css",
+              "RelativeDocumentMoniker": "src\\app\\features\\category\\category.component.css",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\category\\category.component.css",
+              "RelativeToolTip": "src\\app\\features\\category\\category.component.css",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAuwBAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-06-29T10:52:42.223Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "users.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\users\\users.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.ts",
+              "RelativeToolTip": "src\\app\\features\\users\\users.component.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAkwAUAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:44:33.129Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "outlet.component.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\outlets\\outlet.component.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.ts",
+              "RelativeToolTip": "src\\app\\features\\outlets\\outlet.component.ts",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:43:30.7Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "outlet.service.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.service.ts",
+              "RelativeDocumentMoniker": "src\\app\\features\\outlets\\outlet.service.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.service.ts",
+              "RelativeToolTip": "src\\app\\features\\outlets\\outlet.service.ts",
+              "ViewState": "AgIAAAUAAAAAAAAAAJCLwBwAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:41:06.934Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "app.routes.ts",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\app.routes.ts",
+              "RelativeDocumentMoniker": "src\\app\\app.routes.ts",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\app.routes.ts",
+              "RelativeToolTip": "src\\app\\app.routes.ts",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-06-29T10:34:06.971Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "outlet.component.css",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.css",
+              "RelativeDocumentMoniker": "src\\app\\features\\outlets\\outlet.component.css",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.css",
+              "RelativeToolTip": "src\\app\\features\\outlets\\outlet.component.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHMAAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-06-29T10:11:07.319Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "outlet.component.html",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.html",
+              "RelativeDocumentMoniker": "src\\app\\features\\outlets\\outlet.component.html",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\outlets\\outlet.component.html",
+              "RelativeToolTip": "src\\app\\features\\outlets\\outlet.component.html",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAAAFcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-06-29T10:14:57.29Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "users.component.html",
+              "DocumentMoniker": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.html",
+              "RelativeDocumentMoniker": "src\\app\\features\\users\\users.component.html",
+              "ToolTip": "C:\\Users\\DELL\\source\\repos\\Arunsinghsornam\\kitchen-management-ui\\src\\app\\features\\users\\users.component.html",
+              "RelativeToolTip": "src\\app\\features\\users\\users.component.html",
+              "ViewState": "AgIAAAgBAAAAAAAAAAAhwBIBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-06-29T10:09:58.793Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
