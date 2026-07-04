@@ -12,10 +12,17 @@ export class SupplierService {
   constructor(private http: HttpClient) { }
 
   // GET ALL
-  getAll(outletId?: string): Observable<any[]> {
+  getAll(outletId?: string, organizationId?: string): Observable<any[]> {
     let url = this.baseUrl;
+    const params: string[] = [];
     if (outletId) {
-      url += `?outletId=${outletId}`;
+      params.push(`outletId=${outletId}`);
+    }
+    if (organizationId) {
+      params.push(`organizationId=${organizationId}`);
+    }
+    if (params.length > 0) {
+      url += '?' + params.join('&');
     }
     return this.http.get<any>(url).pipe(
       map(res => res.data)
@@ -23,8 +30,8 @@ export class SupplierService {
   }
 
   // ALIAS (for compatibility)
-  getSuppliers(outletId?: string): Observable<any[]> {
-    return this.getAll(outletId);
+  getSuppliers(outletId?: string, organizationId?: string): Observable<any[]> {
+    return this.getAll(outletId, organizationId);
   }
 
   // CREATE

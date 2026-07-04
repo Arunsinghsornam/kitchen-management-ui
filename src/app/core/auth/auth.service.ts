@@ -17,6 +17,7 @@ export interface LoginResponse {
     outletId: string;
     organizationId?: string;
     organizationName?: string;
+    logoUrl?: string;
   };
 }
 
@@ -127,6 +128,16 @@ export class AuthService {
 
   isKitchenStaff(): boolean {
     return this.getRole() === 'kitchen_staff';
+  }
+
+  getLogoUrl(): string {
+    const logo = this.getUser()?.logoUrl;
+    if (!logo) return '';
+    // If it's a relative path starting with /, prefix it with backend URL from environment
+    if (logo.startsWith('/')) {
+      return `${environment.apiUrl}${logo}`;
+    }
+    return logo;
   }
 
 }

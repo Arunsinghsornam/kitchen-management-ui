@@ -122,7 +122,8 @@ export const routes: Routes = [
         path: 'users',
         canActivate: [
           roleGuard([
-            'super_admin'
+            'super_admin',
+            'power_admin'
           ])
         ],
         loadComponent: () =>
@@ -134,7 +135,8 @@ export const routes: Routes = [
         path: 'outlets',
         canActivate: [
           roleGuard([
-            'super_admin'
+            'super_admin',
+            'power_admin'
           ])
         ],
         loadComponent: () =>
@@ -154,6 +156,18 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/pl-report/pl-report.component')
             .then(m => m.PLReportComponent)
+      },
+
+      {
+        path: 'approvals',
+        canActivate: [
+          roleGuard([
+            'power_admin'
+          ])
+        ],
+        loadComponent: () =>
+          import('./features/approvals/approvals.component')
+            .then(m => m.ApprovalsComponent)
       }
 
     ]

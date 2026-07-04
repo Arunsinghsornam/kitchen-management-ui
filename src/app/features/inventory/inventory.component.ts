@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { InventoryService } from './inventory.service';
 import { AuthService } from '../../services/auth.service';
 import { OutletService, Outlet } from '../outlets/outlet.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-inventory',
@@ -20,6 +22,17 @@ import { OutletService, Outlet } from '../outlets/outlet.service';
         </div>
 
         <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+          <!-- Organization Dropdown filter for Power Admin -->
+          <div *ngIf="isPowerAdmin" class="outlet-filter-box">
+            <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+                    style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+              <option value="">All Organizations</option>
+              <option *ngFor="let org of organizations" [value]="org.id">
+                {{ org.name }}
+              </option>
+            </select>
+          </div>
+
           <!-- Outlet Dropdown filter for Super Admin -->
           <div *ngIf="isSuperAdmin" class="outlet-filter-box">
             <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
@@ -307,13 +320,17 @@ export class InventoryComponent implements OnInit {
   private inventoryService = inject(InventoryService);
   private authService = inject(AuthService);
   private outletService = inject(OutletService);
+  private http = inject(HttpClient);
 
   items: any[] = [];
   categories: any[] = [];
   outlets: Outlet[] = [];
+  organizations: any[] = [];
 
   isSuperAdmin = false;
+  isPowerAdmin = false;
   selectedOutletId = '';
+  selectedOrganizationId = '';
 
   showAddForm = false;
 
@@ -329,7 +346,11 @@ export class InventoryComponent implements OnInit {
   ngOnInit(): void {
     const user = this.authService.currentUser;
     this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+    this.isPowerAdmin = user?.role === 'power_admin';
 
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
     if (this.isSuperAdmin) {
       this.loadOutlets();
     } else {
@@ -339,10 +360,26 @@ export class InventoryComponent implements OnInit {
     }
   }
 
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
+  }
+
   loadOutlets(): void {
-    this.outletService.getOutlets().subscribe({
+    this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
       next: (data) => {
         this.outlets = data;
+        if (this.outlets.length > 0 && !this.selectedOutletId) {
+          this.selectedOutletId = this.outlets[0].id || '';
+          this.loadInventory();
+          this.loadCategories();
+        }
       },
       error: (err) => console.error('Error loading outlets:', err)
     });
@@ -382,6 +419,13 @@ export class InventoryComponent implements OnInit {
   }
 
   onOutletFilterChange(): void {
+    this.loadInventory();
+    this.loadCategories();
+  }
+
+  onOrganizationChange(): void {
+    this.selectedOutletId = '';
+    this.loadOutlets();
     this.loadInventory();
     this.loadCategories();
   }

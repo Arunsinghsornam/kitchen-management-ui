@@ -8,6 +8,17 @@
     </div>
 
     <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+      <!-- Organization Dropdown filter for Power Admin -->
+      <div *ngIf="isPowerAdmin" class="outlet-filter-box">
+        <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+          <option value="">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
       <!-- Outlet Dropdown filter for Super Admin -->
       <div *ngIf="isSuperAdmin" class="outlet-filter-box">
         <select [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()" 
@@ -58,7 +69,18 @@
 
     <div class="grid">
 
-      <!-- Outlet Dropdown in Form for Super Admin -->
+      <!-- Organization Dropdown in Form for Power Admin -->
+      <div class="form-group" *ngIf="isPowerAdmin" style="grid-column: span 3; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;">
+        <label style="font-weight: 600; color: #777;">Organization</label>
+        <select [(ngModel)]="modalOrganizationId" (change)="onModalOrganizationChange()" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;">
+          <option value="">-- Select Organization --</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Outlet Dropdown in Form for Super Admin / Power Admin -->
       <div class="form-group" *ngIf="isSuperAdmin" style="grid-column: span 3; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px;">
         <label style="font-weight: 600; color: #777;">Outlet</label>
         <select [(ngModel)]="purchase.outletId" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;">

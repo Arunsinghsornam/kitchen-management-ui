@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { UserService, User, CreateUser } from './user.service';
 import { OutletService, Outlet } from '../outlets/outlet.service';
+import { AuthService } from '../../services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-users',
@@ -32,20 +35,32 @@ export class UsersComponent implements OnInit {
     outletId: null
   };
 
+  isPowerAdmin = false;
+  currentUserId = '';
+  organizations: any[] = [];
+  selectedOrganizationId = '';
+
   constructor(
     private userService: UserService,
-    private outletService: OutletService
+    private outletService: OutletService,
+    private authService: AuthService,
+    private http: HttpClient
   ) { }
 
-ngOnInit(): void {
+  ngOnInit(): void {
+    console.log('UsersComponent initialized');
+    
+    const user = this.authService.currentUser;
+    this.isPowerAdmin = user?.role === 'power_admin';
+    this.currentUserId = user?.userId || '';
 
-  console.log('UsersComponent initialized');
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
 
-  this.loadUsers();
-
-  this.loadOutlets();
-
-}
+    this.loadUsers();
+    this.loadOutlets();
+  }
 
   addUser(): void {
 
@@ -85,11 +100,15 @@ ngOnInit(): void {
     // ===========================
     if (this.editing) {
 
-      const updatedUser = {
+      const updatedUser: any = {
         fullName: this.newUser.fullName,
         role: this.newUser.role,
         outletId: this.newUser.outletId
       };
+
+      if (this.isPowerAdmin) {
+        updatedUser.email = this.newUser.email;
+      }
 
       this.userService.updateUser(this.editingUserId, updatedUser).subscribe({
 
@@ -226,30 +245,30 @@ resetPassword(user: User): void {
 
 }
   loadUsers(): void {
+    this.userService.getUsers(this.selectedOrganizationId).subscribe({
+      next: (response) => {
+        this.users = response.data;
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
 
-  this.userService.getUsers().subscribe({
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
+  }
 
-    next: (response) => {
-
-      console.log(response);
-
-      console.log(response.data);
-
-      console.log(response.data.length);
-
-      this.users = response.data;
-
-      console.log(this.users);
-
-    },
-
-    error: (err) => {
-      console.error(err);
-    }
-
-  });
-
-}
+  onOrganizationChange(): void {
+    this.loadUsers();
+  }
 
   loadOutlets(): void {
 

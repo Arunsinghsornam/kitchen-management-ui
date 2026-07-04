@@ -1,9 +1,13 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 import { RecipeService } from './recipe.service';
 import { RawMaterialService } from '../inventory/raw-material.service';
+import { AuthService } from '../../services/auth.service';
+import { OutletService, Outlet } from '../outlets/outlet.service';
 
 @Component({
 selector: 'app-recipes',
@@ -16,10 +20,19 @@ export class RecipesComponent implements OnInit {
 
 private recipeService = inject(RecipeService);
 private rawMaterialService = inject(RawMaterialService);
+private authService = inject(AuthService);
+private outletService = inject(OutletService);
+private http = inject(HttpClient);
 
 recipes: any[] = [];
 rawMaterials: any[] = [];
+outlets: Outlet[] = [];
+organizations: any[] = [];
 
+isSuperAdmin = false;
+isPowerAdmin = false;
+selectedOutletId = '';
+selectedOrganizationId = '';
 searchText = '';
 
 showForm = false;
@@ -31,12 +44,78 @@ recipe: any = {
 name: '',
 category: '',
 sellingPrice: null,
+outletId: '',
 ingredients: []
 };
 
 ngOnInit(): void {
-this.loadRecipes();
-this.loadRawMaterials();
+  const user = this.authService.currentUser;
+  this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
+  this.isPowerAdmin = user?.role === 'power_admin';
+
+  if (this.isPowerAdmin) {
+    this.loadOrganizations();
+  }
+  if (this.isSuperAdmin) {
+    this.loadOutlets();
+  } else {
+    this.selectedOutletId = user?.outletId || '';
+    this.loadRecipes();
+  }
+  this.loadRawMaterials();
+}
+
+loadOrganizations(): void {
+  this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+    next: (res) => {
+      if (res.success) {
+        this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+      }
+    },
+    error: (err) => console.error('Error loading organizations:', err)
+  });
+}
+
+loadOutlets(): void {
+  this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
+    next: data => {
+      this.outlets = data;
+      if (this.outlets.length > 0 && !this.selectedOutletId) {
+        this.selectedOutletId = this.outlets[0].id || '';
+        this.loadRecipes();
+        this.loadRawMaterials();
+      }
+    },
+    error: err => console.error(err)
+  });
+}
+
+onOrganizationChange(): void {
+  this.selectedOutletId = '';
+  this.loadOutlets();
+  this.recipes = [];
+  this.rawMaterials = [];
+}
+
+onOutletFilterChange(): void {
+  if (this.selectedOutletId) {
+    this.loadRecipes();
+    this.loadRawMaterials();
+  } else {
+    this.recipes = [];
+    this.rawMaterials = [];
+  }
+}
+
+onModalOutletChange(): void {
+  // Reload raw materials for the selected outlet inside the modal
+  this.rawMaterialService.getMaterials(this.recipe.outletId).subscribe({
+    next: (data) => {
+      this.rawMaterials = data || [];
+      this.recipe.ingredients = []; // Clear ingredients since they belonged to the other outlet's materials
+    },
+    error: (err) => console.error(err)
+  });
 }
 
 // ======================
@@ -118,53 +197,35 @@ return this.recipes.filter(recipe =>
 // ======================
 
 loadRecipes(): void {
-
-
-this.recipeService.getRecipes().subscribe({
-
-  next: (data) => {
-
-    this.recipes = data || [];
-
-  },
-
-  error: (err) => {
-
-    console.error(
-      'Failed to load recipes',
-      err
-    );
-
+  if (this.isSuperAdmin && !this.selectedOutletId) {
+    this.recipes = [];
+    return;
   }
 
-});
-
-
+  this.recipeService.getRecipes(this.selectedOutletId).subscribe({
+    next: (data) => {
+      this.recipes = data || [];
+    },
+    error: (err) => {
+      console.error('Failed to load recipes', err);
+    }
+  });
 }
 
 loadRawMaterials(): void {
-
-
-this.rawMaterialService.getMaterials().subscribe({
-
-  next: (data) => {
-
-    this.rawMaterials = data || [];
-
-  },
-
-  error: (err) => {
-
-    console.error(
-      'Failed to load raw materials',
-      err
-    );
-
+  if (this.isSuperAdmin && !this.selectedOutletId) {
+    this.rawMaterials = [];
+    return;
   }
 
-});
-
-
+  this.rawMaterialService.getMaterials(this.selectedOutletId).subscribe({
+    next: (data) => {
+      this.rawMaterials = data || [];
+    },
+    error: (err) => {
+      console.error('Failed to load raw materials', err);
+    }
+  });
 }
 
 // ======================
@@ -464,7 +525,8 @@ const request = this.editing
     )
 
   : this.recipeService.createRecipe(
-      this.recipe
+      this.recipe,
+      this.recipe.outletId || this.selectedOutletId
     );
 
 request.subscribe({

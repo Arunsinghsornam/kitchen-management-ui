@@ -1,15 +1,26 @@
 <div class="category-page">
 
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
     <div>
       <h2>📂 Category Management</h2>
       <p>Manage raw material categories by outlet.</p>
     </div>
 
-    <button class="btn-primary" (click)="openAddForm()" *ngIf="!showForm">
-      ➕ Add Category
-    </button>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <!-- Organization filter for Power Admin -->
+      <select *ngIf="isPowerAdmin" [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+        <option value="">All Organizations</option>
+        <option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+
+      <button class="btn-primary" (click)="openAddForm()" *ngIf="!showForm">
+        ➕ Add Category
+      </button>
+    </div>
   </div>
 
   <!-- Form Card -->
@@ -17,6 +28,17 @@
     <h3>{{ isEditMode ? 'Edit Category' : 'Add Category' }}</h3>
     
     <div class="form-row">
+      <!-- Organization select in form for Power Admin -->
+      <div class="form-group" *ngIf="isPowerAdmin">
+        <label>Organization</label>
+        <select [(ngModel)]="selectedOrganizationId" (change)="onModalOrganizationChange()">
+          <option value="">-- Select Organization --</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
+
       <div class="form-group" *ngIf="isSuperAdmin">
         <label>Outlet</label>
         <select [(ngModel)]="category.outletId">

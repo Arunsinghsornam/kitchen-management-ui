@@ -11,7 +11,11 @@ export class RawMaterialService {
 
   private apiUrl = 'http://localhost:5253/api/RawMaterials';
 
-  getMaterials(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getMaterials(outletId?: string): Observable<any[]> {
+    let url = this.apiUrl;
+    if (outletId) {
+      url += `?outletId=${outletId}`;
+    }
+    return this.http.get<any[]>(url);
   }
 }

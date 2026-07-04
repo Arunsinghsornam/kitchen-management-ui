@@ -1,8 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 import { Outlet, OutletService } from './outlet.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-outlet',
@@ -17,25 +20,48 @@ import { Outlet, OutletService } from './outlet.service';
 export class OutletComponent implements OnInit {
 
   private outletService = inject(OutletService);
+  private authService = inject(AuthService);
+  private http = inject(HttpClient);
 
   outlets: Outlet[] = [];
+  organizations: any[] = [];
 
   newOutlet: Outlet = {
     name: '',
     address: '',
-    active: true
+    active: true,
+    organizationId: ''
   };
 
+  isPowerAdmin = false;
   isEditMode = false;
   editingId = '';
   showForm = false;
+  selectedOrganizationId = '';
 
   ngOnInit(): void {
+    const user = this.authService.currentUser;
+    this.isPowerAdmin = user?.role === 'power_admin';
+
+    if (this.isPowerAdmin) {
+      this.loadOrganizations();
+    }
     this.loadOutlets();
   }
 
+  loadOrganizations(): void {
+    this.http.get<any>(`${environment.apiUrl}/api/organizations`).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.organizations = res.data.filter((o: any) => o.status === 'Approved');
+        }
+      },
+      error: (err) => console.error('Error loading organizations:', err)
+    });
+  }
+
   loadOutlets(): void {
-    this.outletService.getOutlets().subscribe({
+    this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
       next: (data) => {
         this.outlets = data;
       },
@@ -45,6 +71,10 @@ export class OutletComponent implements OnInit {
     });
   }
 
+  onOrganizationChange(): void {
+    this.loadOutlets();
+  }
+
   openAddForm(): void {
     this.isEditMode = false;
     this.showForm = true;
@@ -52,7 +82,8 @@ export class OutletComponent implements OnInit {
     this.newOutlet = {
       name: '',
       address: '',
-      active: true
+      active: true,
+      organizationId: this.selectedOrganizationId || ''
     };
   }
 

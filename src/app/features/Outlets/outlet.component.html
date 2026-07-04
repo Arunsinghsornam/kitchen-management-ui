@@ -1,21 +1,44 @@
 <div class="outlet-page">
 
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
     <div>
       <h2>🏢 Outlet Management</h2>
-      <p>Manage all Pav Republic outlets.</p>
+      <p>Manage all outlets across organizations.</p>
     </div>
 
-    <button class="btn-primary" (click)="openAddForm()" *ngIf="!showForm">
-      ➕ Add Outlet
-    </button>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <!-- Organization filter for Power Admin -->
+      <select *ngIf="isPowerAdmin" [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+        <option value="">All Organizations</option>
+        <option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+
+      <button class="btn-primary" (click)="openAddForm()" *ngIf="!showForm">
+        ➕ Add Outlet
+      </button>
+    </div>
   </div>
 
   <!-- Form Card -->
   <div class="outlet-card" *ngIf="showForm">
     <h3>{{ isEditMode ? 'Edit Outlet' : 'Add Outlet' }}</h3>
     <div class="form-row">
+
+      <!-- Organization select in form for Power Admin -->
+      <div class="form-group" *ngIf="isPowerAdmin">
+        <label>Organization</label>
+        <select [(ngModel)]="newOutlet.organizationId"
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+          <option value="">-- Select Organization --</option>
+          <option *ngFor="let org of organizations" [value]="org.id">
+            {{ org.name }}
+          </option>
+        </select>
+      </div>
 
       <div class="form-group">
         <label>Outlet Name</label>

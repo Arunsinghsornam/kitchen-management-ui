@@ -31,8 +31,12 @@ export class CategoryService {
   // CATEGORY APIs
   // =========================
 
-  getCategories(): Observable<Category[]> {
-    return this.http.get<Category[]>(this.categoryApi);
+  getCategories(organizationId?: string): Observable<Category[]> {
+    let url = this.categoryApi;
+    if (organizationId) {
+      url += `?organizationId=${organizationId}`;
+    }
+    return this.http.get<Category[]>(url);
   }
 
   createCategory(category: Partial<Category>): Observable<Category> {
@@ -51,7 +55,11 @@ export class CategoryService {
   // OUTLET APIs
   // =========================
 
-  getOutlets(): Observable<Outlet[]> {
-    return this.http.get<Outlet[]>(this.outletApi);
+  getOutlets(organizationId?: string): Observable<Outlet[]> {
+    let url = this.outletApi;
+    if (organizationId) {
+      url += `?organizationId=${organizationId}`;
+    }
+    return this.http.get<Outlet[]>(url);
   }
 }

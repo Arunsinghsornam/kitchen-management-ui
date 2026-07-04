@@ -213,10 +213,12 @@ export class LoginComponent {
 
       if (err.status === 401) {
         this.error = 'Invalid email or password';
+      } else if (err.status === 403) {
+        this.error = err.error?.message || 'Access denied';
       } else if (err.status === 400) {
         this.error = 'Please enter email and password';
       } else {
-        this.error = 'Server error';
+        this.error = err.error?.message || 'Server error';
       }
     }
   });

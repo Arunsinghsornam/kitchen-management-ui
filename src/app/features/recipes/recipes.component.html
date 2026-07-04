@@ -1,18 +1,39 @@
 <div class="recipes-container">
 
   <!-- HEADER -->
-  <div class="header">
+  <div class="header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
 
     <div>
       <h2>Recipes</h2>
       <small>Manage menu recipes and ingredient costing</small>
     </div>
 
-    <button
-      class="btn-primary"
-      (click)="newRecipe()">
-      + Add Recipe
-    </button>
+    <div style="display: flex; align-items: center; gap: 15px;">
+      <!-- Organization filter for Power Admin -->
+      <select *ngIf="isPowerAdmin" [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+        <option value="">All Organizations</option>
+        <option *ngFor="let org of organizations" [value]="org.id">
+          {{ org.name }}
+        </option>
+      </select>
+
+      <!-- Outlet filter for Super Admin / Power Admin -->
+      <select *ngIf="isSuperAdmin" [(ngModel)]="selectedOutletId" (change)="onOutletFilterChange()"
+              style="padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
+        <option value="">-- Select Outlet --</option>
+        <option *ngFor="let outlet of outlets" [value]="outlet.id">
+          {{ outlet.name }}
+        </option>
+      </select>
+
+      <button
+        class="btn-primary"
+        (click)="newRecipe()"
+        [disabled]="isSuperAdmin && !selectedOutletId">
+        + Add Recipe
+      </button>
+    </div>
 
   </div>
 
@@ -164,6 +185,20 @@
           ✕
         </button>
 
+      </div>
+
+      <!-- Outlet Dropdown inside Modal for Super Admin / Power Admin -->
+      <div class="form-row" *ngIf="isSuperAdmin">
+        <div class="form-group" style="flex: 1;">
+          <label>Outlet</label>
+          <select [(ngModel)]="recipe.outletId" (change)="onModalOutletChange()" 
+                  style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: white; outline: none;">
+            <option value="">-- Select Outlet --</option>
+            <option *ngFor="let outlet of outlets" [value]="outlet.id">
+              {{ outlet.name }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div class="form-row">

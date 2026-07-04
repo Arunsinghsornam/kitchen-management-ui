@@ -10,7 +10,7 @@ import { AuthService } from '../../core/auth/auth.service';
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="register-page">
-      <div class="register-card">
+      <div class="register-card" *ngIf="!isRegistered">
         <div class="logo">🍞</div>
         <h1>Start Your Kitchen Journey</h1>
         <p class="subtitle">Create a new organization & setup your first outlet</p>
@@ -32,6 +32,16 @@ import { AuthService } from '../../core/auth/auth.service';
             <div class="field-error" *ngIf="orgNameInput.touched && orgNameInput.invalid">
               Organization name is required
             </div>
+          </div>
+
+          <div class="form-group">
+            <label>Organization Logo (Optional)</label>
+            <input
+              type="file"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              style="padding: 8px 14px; border: 2px dashed #e0e0e0; cursor: pointer; width: 100%; border-radius: 8px;"
+            />
           </div>
 
           <div class="form-grid">
@@ -118,13 +128,25 @@ import { AuthService } from '../../core/auth/auth.service';
           <div class="error" *ngIf="error">{{ error }}</div>
 
           <button class="register-btn" type="submit" [disabled]="registerForm.invalid || loading">
-            {{ loading ? 'Creating account...' : 'Create Account & Login' }}
+            {{ loading ? 'Submitting Request...' : 'Submit Onboarding Request' }}
           </button>
 
           <div class="signin-link">
             Already have an account? <a routerLink="/login">Sign In</a>
           </div>
         </form>
+      </div>
+
+      <div class="register-card" *ngIf="isRegistered" style="max-width: 450px;">
+        <div class="logo" style="font-size: 64px; margin-bottom: 20px;">⏳</div>
+        <h1 style="color: #ff6b35; font-size: 24px; margin-bottom: 12px;">Onboarding Pending</h1>
+        <p style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 24px; text-align: left;">
+          Your request to onboard <strong>{{ orgName }}</strong> has been submitted.
+          <br/><br/>
+          It is currently pending approval by the platform administrator. 
+          An email notification will be sent to <strong>{{ email }}</strong> once the status is updated.
+        </p>
+        <button class="register-btn" routerLink="/login">Back to Sign In</button>
       </div>
     </div>
   `,
@@ -286,34 +308,45 @@ export class RegisterComponent {
   fullName = '';
   email = '';
   password = '';
+  selectedFile: File | null = null;
 
   error = '';
   loading = false;
   showPwd = false;
+  isRegistered = false;
 
   constructor(
     private auth: AuthService,
     private router: Router
   ) {}
 
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
   register() {
     this.error = '';
     this.loading = true;
 
-    const payload = {
-      organizationName: this.orgName,
-      outletName: this.outletName,
-      outletAddress: this.outletAddress,
-      fullName: this.fullName,
-      email: this.email,
-      password: this.password
-    };
+    const formData = new FormData();
+    formData.append('organizationName', this.orgName);
+    formData.append('outletName', this.outletName);
+    formData.append('outletAddress', this.outletAddress);
+    formData.append('fullName', this.fullName);
+    formData.append('email', this.email);
+    formData.append('password', this.password);
+    if (this.selectedFile) {
+      formData.append('logo', this.selectedFile);
+    }
 
-    this.auth.register(payload).subscribe({
+    this.auth.register(formData).subscribe({
       next: (response: any) => {
         this.loading = false;
-        if (response.success && response.data?.accessToken) {
-          this.router.navigate(['/dashboard']);
+        if (response.success) {
+          this.isRegistered = true;
         } else {
           this.error = response?.message || 'Registration failed';
         }
