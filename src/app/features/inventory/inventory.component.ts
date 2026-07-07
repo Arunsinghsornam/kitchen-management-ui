@@ -59,6 +59,7 @@ import { environment } from '../../../environments/environment';
               <th>Category</th>
               <th>Unit</th>
               <th>Stock</th>
+              <th style="text-align: right; padding-right: 20px;">Actions</th>
             </tr>
           </thead>
 
@@ -81,10 +82,25 @@ import { environment } from '../../../environments/environment';
                   {{ item.currentStock }}
                 </span>
               </td>
+
+              <td style="text-align: right; white-space: nowrap; padding-right: 20px;">
+                <button class="action-btn edit-btn" (click)="openEditForm(item)" style="background: #e3f2fd; color: #1565c0; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 8px; font-size: 13px;">
+                  ✏️ Edit
+                </button>
+                <button class="action-btn adjust-btn" (click)="openAdjustForm(item)" style="background: #fff3e0; color: #e65100; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 8px; font-size: 13px;">
+                  ⚖️ Adjust
+                </button>
+                <button *ngIf="isSuperAdmin" class="action-btn history-btn" (click)="openLedgerModal(item)" style="background: #e0f2f1; color: #00796b; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-right: 8px; font-size: 13px;">
+                  📜 History
+                </button>
+                <button class="action-btn delete-btn" (click)="deleteItem(item)" style="background: #ffebee; color: #c62828; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px;">
+                  🗑️ Delete
+                </button>
+              </td>
             </tr>
 
             <tr *ngIf="items.length === 0">
-              <td colspan="5" style="text-align: center; color: #777; padding: 20px;">
+              <td colspan="6" style="text-align: center; color: #777; padding: 20px;">
                 {{ (isSuperAdmin && !selectedOutletId) ? 'Please select an outlet to view inventory.' : 'No inventory items found.' }}
               </td>
             </tr>
@@ -168,7 +184,147 @@ import { environment } from '../../../environments/environment';
               Cancel
             </button>
           </div>
+        </div>
+      </div>
 
+      <!-- Edit Item Modal -->
+      <div *ngIf="showEditForm" class="modal">
+        <div class="modal-box">
+          <h2>Edit Raw Material</h2>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Item Code</label>
+              <input [(ngModel)]="editingItem.code" placeholder="RM001">
+            </div>
+
+            <div class="form-group">
+              <label>Item Name</label>
+              <input [(ngModel)]="editingItem.name" placeholder="Tomato">
+            </div>
+
+            <div class="form-group">
+              <label>Unit</label>
+              <select [(ngModel)]="editingItem.unit">
+                <option value="Kg">Kg</option>
+                <option value="Gram">Gram</option>
+                <option value="Litre">Litre</option>
+                <option value="Piece">Piece</option>
+                <option value="Pack">Pack</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Category</label>
+              <select [(ngModel)]="editingItem.categoryId">
+                <option [ngValue]="null">Select Category</option>
+                <option *ngFor="let cat of categories" [ngValue]="cat.id">
+                  {{ cat.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Reorder Level</label>
+              <input type="number" [(ngModel)]="editingItem.reorderLevel">
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="save-btn" (click)="saveEditItem()">
+              Save
+            </button>
+            <button class="cancel-btn" (click)="showEditForm = false">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adjust Stock Modal -->
+      <div *ngIf="showAdjustForm" class="modal">
+        <div class="modal-box" style="width: 450px;">
+          <h2>Adjust Stock - {{ adjustingItem?.name }}</h2>
+          <p style="color: #777; font-size: 14px; margin-top: 4px;">
+            Current Stock: <strong>{{ adjustingItem?.currentStock }} {{ adjustingItem?.unit }}</strong>
+          </p>
+          
+          <div class="form-grid" style="grid-template-columns: 1fr; margin-top: 20px;">
+            <div class="form-group">
+              <label>Adjustment Quantity</label>
+              <input type="number" [(ngModel)]="adjustmentQuantity" placeholder="e.g. 5 or -3">
+              <small style="color: #666; margin-top: 4px; display: block;">Use positive numbers to add stock, negative to subtract stock.</small>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <label>Notes / Reason</label>
+              <textarea [(ngModel)]="adjustmentNotes" placeholder="Reason for adjustment..." style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px; font-family: inherit; outline: none;"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="save-btn" (click)="saveAdjustment()" [disabled]="!adjustmentQuantity">
+              Adjust
+            </button>
+            <button class="cancel-btn" (click)="showAdjustForm = false">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Stock History Ledger Modal -->
+      <div *ngIf="showLedgerModal" class="modal">
+        <div class="modal-box" style="width: 700px; max-width: 90vw;">
+          <h2>Stock History - {{ ledgerItem?.name }}</h2>
+          <p style="color: #777; font-size: 14px; margin-top: 4px;">
+            Audit trail of all inventory movements.
+          </p>
+
+          <div style="margin-top: 20px; max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 12px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: #fdfcf9; border-bottom: 2px solid #eee;">
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555;">Date</th>
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555;">Type</th>
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555; text-align: right;">Qty In</th>
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555; text-align: right;">Qty Out</th>
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555; text-align: right;">Balance</th>
+                  <th style="padding: 10px; font-size: 13px; font-weight: 700; color: #555;">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of ledgerEntries" style="border-bottom: 1px solid #f9f9f9; font-size: 13px;">
+                  <td style="padding: 10px;">{{ entry.txnDate | date:'short' }}</td>
+                  <td style="padding: 10px;">
+                    <span style="padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;"
+                          [style.background]="entry.txnType === 'ADJUSTMENT' ? '#fff3e0' : entry.txnType === 'PURCHASE' ? '#e8f6ea' : '#ffebee'"
+                          [style.color]="entry.txnType === 'ADJUSTMENT' ? '#e65100' : entry.txnType === 'PURCHASE' ? '#2e7d32' : '#c62828'">
+                      {{ entry.txnType }}
+                    </span>
+                  </td>
+                  <td style="padding: 10px; text-align: right; font-weight: 600; color: #2e7d32;">
+                    {{ entry.quantityIn > 0 ? '+' + entry.quantityIn : '-' }}
+                  </td>
+                  <td style="padding: 10px; text-align: right; font-weight: 600; color: #c62828;">
+                    {{ entry.quantityOut > 0 ? '-' + entry.quantityOut : '-' }}
+                  </td>
+                  <td style="padding: 10px; text-align: right; font-weight: 700;">{{ entry.balanceAfter }}</td>
+                  <td style="padding: 10px; color: #666; font-style: italic;">{{ entry.notes || '-' }}</td>
+                </tr>
+                <tr *ngIf="ledgerEntries.length === 0">
+                  <td colspan="6" style="text-align: center; color: #999; padding: 20px;">
+                    No inventory movements recorded yet.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="modal-actions" style="margin-top: 20px;">
+            <button class="cancel-btn" (click)="showLedgerModal = false" style="margin-left: auto;">
+              Close
+            </button>
+          </div>
         </div>
       </div>
 
@@ -343,6 +499,16 @@ export class InventoryComponent implements OnInit {
     categoryId: null
   };
 
+  showEditForm = false;
+  showAdjustForm = false;
+  showLedgerModal = false;
+  editingItem: any = {};
+  adjustingItem: any = null;
+  ledgerItem: any = null;
+  ledgerEntries: any[] = [];
+  adjustmentQuantity: number | null = null;
+  adjustmentNotes = '';
+
   ngOnInit(): void {
     const user = this.authService.currentUser;
     this.isSuperAdmin = user?.role === 'super_admin' || user?.role === 'power_admin';
@@ -478,6 +644,87 @@ export class InventoryComponent implements OnInit {
       error: (err) => {
         console.error(err);
         alert(err?.error?.message ?? 'Failed to save raw material');
+      }
+    });
+  }
+
+  openEditForm(item: any): void {
+    this.editingItem = { ...item };
+    this.showEditForm = true;
+  }
+
+  saveEditItem(): void {
+    if (!this.editingItem.name?.trim()) {
+      alert('Item name is required.');
+      return;
+    }
+
+    this.inventoryService.update(this.editingItem.id, this.editingItem).subscribe({
+      next: () => {
+        alert('Raw Material updated successfully.');
+        this.showEditForm = false;
+        this.loadInventory();
+      },
+      error: (err) => {
+        console.error(err);
+        alert(err?.error?.message ?? 'Failed to update raw material');
+      }
+    });
+  }
+
+  openAdjustForm(item: any): void {
+    this.adjustingItem = item;
+    this.adjustmentQuantity = null;
+    this.adjustmentNotes = '';
+    this.showAdjustForm = true;
+  }
+
+  saveAdjustment(): void {
+    if (this.adjustmentQuantity === null || this.adjustmentQuantity === undefined) {
+      alert('Please enter adjustment quantity.');
+      return;
+    }
+
+    this.inventoryService.adjustStock(this.adjustingItem.id, this.adjustmentQuantity, this.adjustmentNotes).subscribe({
+      next: () => {
+        alert('Stock adjusted successfully.');
+        this.showAdjustForm = false;
+        this.loadInventory();
+      },
+      error: (err) => {
+        console.error(err);
+        alert(err?.error?.message ?? 'Failed to adjust stock');
+      }
+    });
+  }
+
+  deleteItem(item: any): void {
+    if (confirm(`Are you sure you want to delete ${item.name}?`)) {
+      this.inventoryService.delete(item.id).subscribe({
+        next: () => {
+          alert('Raw Material deleted successfully.');
+          this.loadInventory();
+        },
+        error: (err) => {
+          console.error(err);
+          alert(err?.error?.message ?? 'Failed to delete raw material');
+        }
+      });
+    }
+  }
+
+  openLedgerModal(item: any): void {
+    this.ledgerItem = item;
+    this.ledgerEntries = [];
+    this.showLedgerModal = true;
+
+    this.inventoryService.getLedger(item.id).subscribe({
+      next: (res) => {
+        this.ledgerEntries = res;
+      },
+      error: (err) => {
+        console.error('Error loading stock history:', err);
+        alert('Failed to load stock history.');
       }
     });
   }

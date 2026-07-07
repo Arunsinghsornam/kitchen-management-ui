@@ -62,8 +62,18 @@ summaryCards = computed(() => {
       type: 'currency'
     },
     {
+      label: 'Total Expenses',
+      value: r.totalExpenses || 0,
+      type: 'currency'
+    },
+    {
       label: 'Gross Profit',
       value: r.totalGrossProfit,
+      type: 'currency'
+    },
+    {
+      label: 'Net Profit',
+      value: r.netProfit || 0,
       type: 'currency'
     },
     {

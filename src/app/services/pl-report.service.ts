@@ -16,7 +16,9 @@ export interface DailyPLRow {
   discount: number;
   netRevenue: number;
   cogs: number;
+  expenses: number;
   grossProfit: number;
+  netProfit: number;
   grossMarginPct: number;
   purchaseSpend: number;
 }
@@ -30,7 +32,9 @@ export interface MonthlyPLRow {
   discount: number;
   netRevenue: number;
   cogs: number;
+  expenses: number;
   grossProfit: number;
+  netProfit: number;
   grossMarginPct: number;
 }
 
@@ -65,6 +69,8 @@ export interface PLReportResponse {
   totalRevenue: number;
   totalCogs: number;
   totalGrossProfit: number;
+  totalExpenses: number;
+  netProfit: number;
   avgMarginPct: number;
   totalOrders: number;
   totalPurchaseSpend: number;

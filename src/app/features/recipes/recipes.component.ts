@@ -45,6 +45,7 @@ name: '',
 category: '',
 sellingPrice: null,
 outletId: '',
+imageUrl: '',
 ingredients: []
 };
 
@@ -232,6 +233,26 @@ loadRawMaterials(): void {
 // FORM
 // ======================
 
+onFileSelected(event: any): void {
+  const file: File = event.target.files[0];
+  if (file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post<any>(`${environment.apiUrl}/api/recipes/upload`, formData).subscribe({
+      next: (res) => {
+        if (res?.imageUrl) {
+          this.recipe.imageUrl = res.imageUrl;
+        }
+      },
+      error: (err) => {
+        console.error('Failed to upload image:', err);
+        alert('Failed to upload image');
+      }
+    });
+  }
+}
+
 newRecipe(): void {
 
 
@@ -241,17 +262,13 @@ this.selectedRecipeId = '';
 
 this.showForm = true;
 
-this.recipe = {
-
-  name: '',
-
-  category: '',
-
-  sellingPrice: null,
-
-  ingredients: []
-
-};
+  this.recipe = {
+    name: '',
+    category: '',
+    sellingPrice: null,
+    imageUrl: '',
+    ingredients: []
+  };
 
 this.addIngredient();
 
@@ -267,12 +284,13 @@ this.editing = false;
 
 this.selectedRecipeId = '';
 
-this.recipe = {
-  name: '',
-  category: '',
-  sellingPrice: null,
-  ingredients: []
-};
+  this.recipe = {
+    name: '',
+    category: '',
+    sellingPrice: null,
+    imageUrl: '',
+    ingredients: []
+  };
 
 
 }
@@ -287,15 +305,11 @@ this.selectedRecipeId = recipe.id;
 this.showForm = true;
 
 this.recipe = {
-
   id: recipe.id,
-
   name: recipe.name,
-
   category: recipe.category,
-
   sellingPrice: recipe.sellingPrice,
-
+  imageUrl: recipe.imageUrl || '',
   ingredients:
     (recipe.ingredients || [])
       .map((x: any) => ({
@@ -545,21 +559,19 @@ request.subscribe({
       name: '',
       category: '',
       sellingPrice: null,
+      imageUrl: '',
       ingredients: []
     };
   },
 
- error: (err) => {
-
-  console.error('Save failed:', err);
-
-  const message =
-    err?.error?.message ||
-    err?.error?.title ||
-    'Failed to save recipe';
-
-  alert(message);
-}
+  error: (err) => {
+    console.error('Save failed:', err);
+    const message =
+      err?.error?.message ||
+      err?.error?.title ||
+      'Failed to save recipe';
+    alert(message);
+  }
 
 });
 

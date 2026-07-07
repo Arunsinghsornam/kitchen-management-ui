@@ -30,4 +30,20 @@ export class InventoryService {
   create(item: any) {
     return this.http.post(this.apiUrl, item);
   }
+
+  update(id: string, item: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, item);
+  }
+
+  adjustStock(id: string, quantity: number, notes: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/adjust`, { quantity, notes });
+  }
+
+  delete(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
+
+  getLedger(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${id}/ledger`);
+  }
 }

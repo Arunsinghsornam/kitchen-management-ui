@@ -86,165 +86,133 @@
   </div>
 
   <!-- Modal -->
+  <div class="modal-overlay" *ngIf="showModal">
+    <div class="modal-card pos-modal-card">
+      <div class="modal-header">
+        <h2>New Sale</h2>
+        <button class="close-btn" (click)="showModal=false">✕</button>
+      </div>
 
-  <div
-    class="modal-overlay"
-    *ngIf="showModal">
+      <div class="pos-layout">
+        <!-- Catalog Panel (Left/Center) -->
+        <div class="pos-catalog">
+          <div class="catalog-header">
+            <h3>Menu Catalog</h3>
+          </div>
 
+          <div class="catalog-grid" *ngIf="menuItems && menuItems.length > 0; else noItems">
+            <div class="menu-card" *ngFor="let item of menuItems">
+              <div class="menu-card-image-box">
+                <img [src]="getItemImage(item.name)" [alt]="item.name" class="menu-card-image" />
+              </div>
+              <div class="menu-card-info">
+                <div class="menu-card-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="menu-card-badge-inline" style="font-size: 10px; font-weight: 600; padding: 2px 6px; background: #f3f4f6; color: #4b5563; border-radius: 4px;">
+                    {{ getItemCategory(item) }}
+                  </span>
+                  <p class="menu-card-price" style="margin: 0; font-size: 14px; font-weight: 700; color: #ff6b35;">
+                    ₹{{ item.sellingPrice }}
+                  </p>
+                </div>
+                <h4 style="margin: 0; font-size: 13px; font-weight: 600; color: #1f2937; line-height: 1.4; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                  {{ item.name }}
+                </h4>
+                <button class="menu-card-add-btn-pos" (click)="addItemFromCard(item)" 
+                        style="width: 100%; background: #ff6b35; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 10px; transition: background 0.2s;">
+                  Add to Order
+                </button>
+              </div>
+            </div>
+          </div>
+          <ng-template #noItems>
+            <div class="no-items-warning">
+              <p>No menu items found. Please verify the selected outlet has active recipes.</p>
+            </div>
+          </ng-template>
+        </div>
 
-<div class="modal-card">
+        <!-- Cart Panel (Right) -->
+        <div class="pos-cart">
+          <div class="cart-header">
+            <h3>Current Order</h3>
+          </div>
 
-  <div class="modal-header">
+          <!-- Configuration Fields -->
+          <div class="cart-config">
+            <!-- Organization Dropdown for Power Admin -->
+            <div class="form-group" *ngIf="isPowerAdmin">
+              <label>Organization</label>
+              <select [(ngModel)]="modalOrganizationId" (change)="onModalOrganizationChange()">
+                <option value="">-- Select Organization --</option>
+                <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+              </select>
+            </div>
 
-    <h2>New Sale</h2>
+            <!-- Outlet Dropdown for Super Admin / Power Admin -->
+            <div class="form-group" *ngIf="isSuperAdmin">
+              <label>Outlet</label>
+              <select [(ngModel)]="sale.outletId" (change)="onModalOutletChange()">
+                <option value="">-- Select Outlet --</option>
+                <option *ngFor="let outlet of outlets" [value]="outlet.id">{{ outlet.name }}</option>
+              </select>
+            </div>
 
-    <button
-      class="close-btn"
-      (click)="showModal=false">
-      ✕
-    </button>
+            <div class="form-group">
+              <label>Channel</label>
+              <select [(ngModel)]="sale.channel">
+                <option value="OUTLET">OUTLET</option>
+                <option value="SWIGGY">SWIGGY</option>
+                <option value="ZOMATO">ZOMATO</option>
+              </select>
+            </div>
+          </div>
 
-  </div>
+          <!-- Selected Items List -->
+          <div class="cart-items-container">
+            <div class="cart-item-row-pos" *ngFor="let item of sale.items; let i = index">
+              <div class="cart-item-details">
+                <p class="cart-item-name">{{ getCartItemName(item.menuItemId) }}</p>
+                <p class="cart-item-price-desc">₹{{ item.unitPrice }} × {{ item.quantity }}</p>
+              </div>
+              <div class="cart-item-actions">
+                <button class="qty-btn" (click)="changeQuantity(i, -1)">-</button>
+                <span class="qty-val">{{ item.quantity }}</span>
+                <button class="qty-btn" (click)="changeQuantity(i, 1)">+</button>
+                <button class="cart-remove-btn" (click)="removeItem(i)">✕</button>
+              </div>
+            </div>
 
-  <!-- Organization Dropdown in Form for Power Admin -->
-  <div class="form-group" *ngIf="isPowerAdmin" style="margin-bottom: 10px;">
-    <label>Organization</label>
-    <select [(ngModel)]="modalOrganizationId" (change)="onModalOrganizationChange()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-      <option value="">-- Select Organization --</option>
-      <option *ngFor="let org of organizations" [value]="org.id">
-        {{ org.name }}
-      </option>
-    </select>
-  </div>
+            <div class="empty-cart-msg" *ngIf="sale.items.length === 0">
+              <p>Your order is empty. Click "+" on any menu card to add items.</p>
+            </div>
+          </div>
 
-  <!-- Outlet Dropdown in Form for Super Admin / Power Admin -->
-  <div class="form-group" *ngIf="isSuperAdmin">
-    <label>Outlet</label>
-    <select [(ngModel)]="sale.outletId" (change)="onModalOutletChange()" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-      <option value="">-- Select Outlet --</option>
-      <option *ngFor="let outlet of outlets" [value]="outlet.id">
-        {{ outlet.name }}
-      </option>
-    </select>
-  </div>
+          <!-- Financial Calculation Cards -->
+          <div class="cart-summary">
+            <div class="summary-line">
+              <span>Subtotal:</span>
+              <strong>₹{{ subtotal }}</strong>
+            </div>
 
-  <div class="form-group">
+            <div class="form-group discount-field">
+              <label>Discount (₹)</label>
+              <input type="number" [(ngModel)]="sale.discount" min="0" />
+            </div>
 
-    <label>Channel</label>
+            <div class="summary-line total-line">
+              <span>Total:</span>
+              <strong>₹{{ total }}</strong>
+            </div>
+          </div>
 
-    <select [(ngModel)]="sale.channel">
-
-      <option value="OUTLET">
-        OUTLET
-      </option>
-
-      <option value="SWIGGY">
-        SWIGGY
-      </option>
-
-      <option value="ZOMATO">
-        ZOMATO
-      </option>
-
-    </select>
-
-  </div>
-
-  <button
-    class="btn-secondary"
-    (click)="addItem()">
-
-    + Add Item
-
-  </button>
-
-  <div
-    class="sale-item-row"
-    *ngFor="let item of sale.items; let i=index">
-
-    <select
-      [(ngModel)]="item.menuItemId"
-      (change)="onMenuChange(item)">
-
-      <option value="">
-        Select Menu Item
-      </option>
-
-      <option
-        *ngFor="let m of menuItems"
-        [ngValue]="m.id">
-
-        {{ m.name }}
-
-      </option>
-
-    </select>
-
-    <input
-      type="number"
-      [(ngModel)]="item.quantity"
-      placeholder="Qty">
-
-    <input
-      type="number"
-      [(ngModel)]="item.unitPrice"
-      placeholder="Price">
-
-    <button
-      class="remove-btn"
-      (click)="removeItem(i)">
-      Remove
-    </button>
-
-  </div>
-
-  <div class="totals">
-
-    <p>
-      <strong>Subtotal:</strong>
-      ₹{{ subtotal }}
-    </p>
-
-    <div class="form-group">
-
-      <label>Discount</label>
-
-      <input
-        type="number"
-        [(ngModel)]="sale.discount">
-
+          <!-- POS Buttons -->
+          <div class="modal-actions pos-actions">
+            <button class="btn-primary flex-1" (click)="saveSale()">Save Sale</button>
+            <button class="btn-secondary" (click)="showModal=false">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <p>
-      <strong>Total:</strong>
-      ₹{{ total }}
-    </p>
-
-  </div>
-
-  <div class="modal-actions">
-
-    <button
-      class="btn-primary"
-      (click)="saveSale()">
-
-      Save Sale
-
-    </button>
-
-    <button
-      class="btn-secondary"
-      (click)="showModal=false">
-
-      Cancel
-
-    </button>
-
-  </div>
-
-</div>
-
-
   </div>
 
 </div>
