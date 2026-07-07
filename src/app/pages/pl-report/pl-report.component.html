@@ -146,13 +146,13 @@
               <th class="px-4 py-3 text-left">Date</th>
               <th class="px-4 py-3 text-left">Day</th>
               <th class="px-4 py-3 text-right">Orders</th>
-              <th class="px-4 py-3 text-right">Gross Rev</th>
+              <th class="px-4 py-3 text-right">Sales</th>
               <th class="px-4 py-3 text-right">Discount</th>
+              <th class="px-4 py-3 text-right">Sales After Discount</th>
+              <th class="px-4 py-3 text-right">COG</th>
+              <th class="px-4 py-3 text-right">Expense</th>
               <th class="px-4 py-3 text-right">Net Revenue</th>
-              <th class="px-4 py-3 text-right">COGS</th>
-              <th class="px-4 py-3 text-right">Gross Profit</th>
               <th class="px-4 py-3 text-right">Margin %</th>
-              <th class="px-4 py-3 text-right">Purchase Spend</th>
             </tr>
           </thead>
           <tbody>
@@ -168,13 +168,16 @@
                 </td>
                 <td class="px-4 py-3 text-right font-medium text-gray-900">{{ fmtINR(row.netRevenue) }}</td>
                 <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(row.cogs) }}</td>
-                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.grossProfit)">
-                  {{ fmtINR(row.grossProfit) }}
+                <td class="px-4 py-3 text-right text-red-600">
+                  @if (row.expenses > 0) { {{ fmtINR(row.expenses) }} }
+                  @else { — }
+                </td>
+                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.netProfit)">
+                  {{ fmtINR(row.netProfit) }}
                 </td>
                 <td class="px-4 py-3 text-right" [class]="marginClass(row.grossMarginPct)">
                   {{ row.grossMarginPct | number:'1.1-1' }}%
                 </td>
-                <td class="px-4 py-3 text-right text-gray-500">{{ fmtINR(row.purchaseSpend) }}</td>
               </tr>
             }
           </tbody>
@@ -194,11 +197,9 @@
                 {{ fmtINR(r.totalRevenue) }}
               </td>
               <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(r.totalCogs) }}</td>
-              <td class="px-4 py-3 text-right" [class]="profitClass(r.totalGrossProfit)">{{ fmtINR(r.totalGrossProfit) }}</td>
+              <td class="px-4 py-3 text-right text-red-600">{{ fmtINR(r.totalExpenses) }}</td>
+              <td class="px-4 py-3 text-right" [class]="profitClass(r.netProfit)">{{ fmtINR(r.netProfit) }}</td>
               <td class="px-4 py-3 text-right" [class]="marginClass(r.avgMarginPct)">{{ r.avgMarginPct | number:'1.1-1' }}%</td>
-              <td class="px-4 py-3 text-right text-red-600">
-                {{ fmtINR(r.totalPurchaseSpend) }}
-              </td>
             </tr>
           </tfoot>
         </table>
@@ -213,11 +214,12 @@
             <tr class="border-b border-gray-100 bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500">
               <th class="px-4 py-3 text-left">Month</th>
               <th class="px-4 py-3 text-right">Orders</th>
-              <th class="px-4 py-3 text-right">Gross Revenue</th>
+              <th class="px-4 py-3 text-right">Sales</th>
               <th class="px-4 py-3 text-right">Discount</th>
+              <th class="px-4 py-3 text-right">Sales After Discount</th>
+              <th class="px-4 py-3 text-right">COG</th>
+              <th class="px-4 py-3 text-right">Expense</th>
               <th class="px-4 py-3 text-right">Net Revenue</th>
-              <th class="px-4 py-3 text-right">COGS</th>
-              <th class="px-4 py-3 text-right">Gross Profit</th>
               <th class="px-4 py-3 text-right">Margin %</th>
             </tr>
           </thead>
@@ -233,8 +235,12 @@
                 </td>
                 <td class="px-4 py-3 text-right font-medium text-gray-900">{{ fmtINR(row.netRevenue) }}</td>
                 <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(row.cogs) }}</td>
-                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.grossProfit)">
-                  {{ fmtINR(row.grossProfit) }}
+                <td class="px-4 py-3 text-right text-red-600">
+                  @if (row.expenses > 0) { {{ fmtINR(row.expenses) }} }
+                  @else { — }
+                </td>
+                <td class="px-4 py-3 text-right font-semibold" [class]="profitClass(row.netProfit)">
+                  {{ fmtINR(row.netProfit) }}
                 </td>
                 <td class="px-4 py-3 text-right" [class]="marginClass(row.grossMarginPct)">
                   {{ row.grossMarginPct | number:'1.1-1' }}%
@@ -242,6 +248,22 @@
               </tr>
             }
           </tbody>
+          <tfoot>
+            <tr class="bg-orange-50 border-t-2 border-orange-200 font-bold text-gray-900 text-sm">
+              <td class="px-4 py-3">Total</td>
+              <td class="px-4 py-3 text-right">{{ r.totalOrders }}</td>
+              <td class="px-4 py-3 text-right">{{ fmtINR(r.totalGrossRevenue || 0) }}</td>
+              <td class="px-4 py-3 text-right text-red-500">
+                @if (r.totalDiscount > 0) { -{{ fmtINR(r.totalDiscount) }} }
+                @else { — }
+              </td>
+              <td class="px-4 py-3 text-right">{{ fmtINR(r.totalRevenue) }}</td>
+              <td class="px-4 py-3 text-right text-orange-600">{{ fmtINR(r.totalCogs) }}</td>
+              <td class="px-4 py-3 text-right text-red-600">{{ fmtINR(r.totalExpenses) }}</td>
+              <td class="px-4 py-3 text-right" [class]="profitClass(r.netProfit)">{{ fmtINR(r.netProfit) }}</td>
+              <td class="px-4 py-3 text-right" [class]="marginClass(r.avgMarginPct)">{{ r.avgMarginPct | number:'1.1-1' }}%</td>
+            </tr>
+          </tfoot>
         </table>
       </div>
     }

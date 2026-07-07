@@ -130,6 +130,17 @@ export const routes: Routes = [
           import('./features/users/users.component')
             .then(m => m.UsersComponent)
       },
+      {
+        path: 'org-profile',
+        canActivate: [
+          roleGuard([
+            'super_admin'
+          ])
+        ],
+        loadComponent: () =>
+          import('./features/org-profile/org-profile.component')
+            .then(m => m.OrgProfileComponent)
+      },
 
       {
         path: 'outlets',
@@ -156,6 +167,20 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/pl-report/pl-report.component')
             .then(m => m.PLReportComponent)
+      },
+
+      {
+        path: 'expenses',
+        canActivate: [
+          roleGuard([
+            'super_admin',
+            'store_manager',
+            'accountant'
+          ])
+        ],
+        loadComponent: () =>
+          import('./features/expenses/expenses.component')
+            .then(m => m.ExpensesComponent)
       },
 
       {

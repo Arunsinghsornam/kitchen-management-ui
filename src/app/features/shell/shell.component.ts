@@ -17,7 +17,7 @@ import { AuthService } from '../../core/auth/auth.service';
 
       <div class="sidenav">
 
-        <div class="brand">
+        <div class="brand" [routerLink]="auth.isSuperAdmin() ? '/org-profile' : null" [class.clickable]="auth.isSuperAdmin()">
           <div class="brand-logo-box" style="width: 36px; height: 36px; border-radius: 8px; overflow: hidden; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <img *ngIf="auth.getLogoUrl()" [src]="auth.getLogoUrl()" style="width: 100%; height: 100%; object-fit: cover;" />
             <span *ngIf="!auth.getLogoUrl()" class="brand-icon" style="font-size: 24px;">🍞</span>
@@ -109,6 +109,14 @@ import { AuthService } from '../../core/auth/auth.service';
             📈 P&L Report
           </a>
 
+          <!-- Expenses -->
+          <a
+            *ngIf="auth.isPowerAdmin() || auth.isSuperAdmin() || auth.isStoreManager() || auth.isAccountant()"
+            routerLink="/expenses"
+            routerLinkActive="active">
+            💸 Expenses
+          </a>
+
           <!-- Approvals (Power Admin Only) -->
           <a
             *ngIf="auth.isPowerAdmin()"
@@ -153,6 +161,16 @@ import { AuthService } from '../../core/auth/auth.service';
   gap:12px;
   padding:24px 20px;
   border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.brand.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.brand.clickable:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  opacity: 0.95;
 }
 
 .brand-icon{

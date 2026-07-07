@@ -169,6 +169,8 @@
 
         <tr>
 
+          <th *ngIf="isPowerAdmin">Organization</th>
+
           <th>Full Name</th>
 
           <th>Email</th>
@@ -188,6 +190,12 @@
       <tbody>
 
         <tr *ngFor="let user of users">
+
+          <td *ngIf="isPowerAdmin">
+
+            {{ user.organizationName || '-' }}
+
+          </td>
 
           <td>
 

@@ -179,10 +179,9 @@ export class UsersComponent implements OnInit {
       },
 
       error: (err) => {
-
         console.error(err);
-        alert('Failed to create user');
-
+        const msg = err?.error?.message || err?.error?.title || 'Failed to create user';
+        alert(msg);
       }
 
     });

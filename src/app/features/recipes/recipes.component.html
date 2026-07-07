@@ -80,17 +80,15 @@
       *ngFor="let recipe of filteredRecipes()">
 
       <div class="recipe-header">
-
-        <div>
-
-          <h3>{{ recipe.name }}</h3>
-
-          <div class="category">
-            {{ recipe.category }}
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img [src]="recipe.imageUrl || 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100&auto=format&fit=crop&q=60'" 
+               alt="Recipe" 
+               style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee;" />
+          <div>
+            <h3>{{ recipe.name }}</h3>
+            <div class="category">{{ recipe.category }}</div>
           </div>
-
         </div>
-
       </div>
 
       <div class="recipe-stats">
@@ -228,18 +226,30 @@
       </div>
 
       <div class="form-row">
-
         <div class="form-group">
-
           <label>Selling Price</label>
-
-          <input
-            type="number"
-            [(ngModel)]="recipe.sellingPrice">
-
+          <input type="number" [(ngModel)]="recipe.sellingPrice">
         </div>
-
       </div>
+
+      <div class="form-row" style="display: flex; gap: 15px; align-items: flex-end; margin-bottom: 16px;">
+        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+          <label>Recipe Image URL</label>
+          <input type="text" [(ngModel)]="recipe.imageUrl" placeholder="Paste image URL or choose a file / preset" 
+                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <input type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" #fileInput />
+          <button type="button" class="btn-primary" (click)="fileInput.click()" 
+                  style="padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; background: #ff6b35; color: white; border: none; cursor: pointer;">
+            📁 Upload File
+          </button>
+        </div>
+        <div *ngIf="recipe.imageUrl" style="width: 42px; height: 42px; border-radius: 8px; overflow: hidden; border: 1px solid #ddd; flex-shrink: 0; background: #f9fafb;">
+          <img [src]="recipe.imageUrl" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+      </div>
+
 
       <div class="cost-box">
 

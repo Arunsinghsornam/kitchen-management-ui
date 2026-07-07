@@ -98,6 +98,25 @@ import { environment } from '../../../environments/environment';
 
       </div>
 
+      <!-- LOW OUTLET SALES ALERTS (only for Super Admin / Power Admin) -->
+      <div *ngIf="(isSuperAdmin || isPowerAdmin) && summary?.lowSalesAlerts?.length > 0" class="low-sales-alerts-container" style="margin-top: 24px;">
+        <div class="alert-box" style="background: #fff5f5; border: 1px solid #ffcccc; border-radius: 20px; padding: 24px; box-shadow: 0 4px 12px rgba(255, 0, 0, 0.05); display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">⚠️</span>
+            <h3 style="margin: 0; color: #c53030; font-size: 18px; font-weight: 700;">Low Outlet Sales Alerts</h3>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 10px;">
+            <div *ngFor="let alert of summary.lowSalesAlerts" style="background: white; border-radius: 14px; padding: 16px 20px; border: 1px solid #ffe3e3; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+              <div>
+                <strong style="color: #333; font-size: 15px; display: block;">{{ alert.outletName }}</strong>
+                <span style="color: #c53030; font-size: 13px; font-weight: 600; display: block; margin-top: 4px;">{{ alert.message }}</span>
+              </div>
+              <strong style="font-weight: 700; color: #c53030; font-size: 16px;">₹{{ alert.totalSales }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="content-grid">
       
 
@@ -106,28 +125,36 @@ import { environment } from '../../../environments/environment';
           <canvas id="salesChart"></canvas>
         </div>
 
-        <div class="section side-panel">
+        <div class="section side-panel" style="display: flex; flex-direction: column; gap: 24px;">
+          <div>
+            <h2>Top Selling Items</h2>
+            <div class="top-item" *ngFor="let item of summary?.topItems; let i=index">
+              <span>{{ i + 1 }}</span>
+              <div>
+                <strong>{{ item.name }}</strong>
+                <small>
+                  Qty: {{ item.qty }}
+                  • Revenue: ₹{{ item.revenue }}
+                </small>
+              </div>
+            </div>
+          </div>
 
-  <h2>Top Selling Items</h2>
-
-  <div
-    class="top-item"
-    *ngFor="let item of summary?.topItems; let i=index">
-
-    <span>{{ i + 1 }}</span>
-
-    <div>
-      <strong>{{ item.name }}</strong>
-
-      <small>
-        Qty: {{ item.qty }}
-        • Revenue: ₹{{ item.revenue }}
-      </small>
-    </div>
-
-  </div>
-
-</div>
+          <!-- Outlet Sales Performance (Ascending) -->
+          <div *ngIf="(isSuperAdmin || isPowerAdmin) && summary?.outletSales?.length > 0" style="border-top: 1px solid #eee; padding-top: 20px;">
+            <h2 style="margin-top: 0;">Outlet Sales</h2>
+            <div class="top-item" *ngFor="let outlet of summary?.outletSales; let i=index">
+              <span style="background: #fff2e7; color: #ff6b35;">{{ i + 1 }}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                  <strong>{{ outlet.outletName }}</strong>
+                  <small>Total Sales</small>
+                </div>
+                <strong style="color: #ff6b35; font-size: 15px; margin-left: 10px;">₹{{ outlet.totalSales }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
 <div class="section low-stock">
 
   <h2>Low Stock Alerts</h2>
@@ -139,7 +166,7 @@ import { environment } from '../../../environments/environment';
         <th>Item</th>
         <th>Stock</th>
         <th>Reorder Level</th>
-        <th>Action</th>
+        <th *ngIf="canPurchase">Action</th>
       </tr>
     </thead>
 
@@ -157,7 +184,7 @@ import { environment } from '../../../environments/environment';
           {{ item.reorderLevel }}
         </td>
 
-        <td>
+        <td *ngIf="canPurchase">
           <button (click)="purchaseItem(item)" style="background: #ff6b35; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 600; transition: background 0.2s;">
             Purchase
           </button>
@@ -353,6 +380,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
  
   isSuperAdmin = false;
   isPowerAdmin = false;
+  canPurchase = false;
   showOutletFilter = false;
   outlets: Outlet[] = [];
   organizations: any[] = [];
@@ -363,6 +391,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     const user = this.authService.currentUser;
     this.isSuperAdmin = user?.role === 'super_admin';
     this.isPowerAdmin = user?.role === 'power_admin';
+    this.canPurchase = this.isPowerAdmin || this.isSuperAdmin || user?.role === 'store_manager';
     this.showOutletFilter = this.isSuperAdmin || this.isPowerAdmin;
  
     if (this.isPowerAdmin) {

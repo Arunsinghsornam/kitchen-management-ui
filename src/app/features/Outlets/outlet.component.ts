@@ -83,7 +83,7 @@ export class OutletComponent implements OnInit {
       name: '',
       address: '',
       active: true,
-      organizationId: this.selectedOrganizationId || ''
+      organizationId: this.selectedOrganizationId || this.authService.currentUser?.organizationId || ''
     };
   }
 
@@ -127,7 +127,8 @@ export class OutletComponent implements OnInit {
       id: outlet.id,
       name: outlet.name,
       address: outlet.address,
-      active: outlet.active
+      active: outlet.active,
+      organizationId: outlet.organizationId || this.selectedOrganizationId || this.authService.currentUser?.organizationId || ''
     };
   }
 

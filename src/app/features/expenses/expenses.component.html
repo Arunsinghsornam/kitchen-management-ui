@@ -1,0 +1,216 @@
+<div class="expenses-container">
+  <div class="header-section">
+    <div>
+      <h1>Operational Expenses</h1>
+      <p class="subtitle">Track staff salary, rent, utility bills, and other custom operational expenses</p>
+    </div>
+    <button class="add-btn" (click)="openAddModal()">
+      + Record Expense
+    </button>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-card">
+    <div class="filter-group" *ngIf="isSuperAdmin && outlets.length > 0">
+      <label>Outlet</label>
+      <select [(ngModel)]="selectedOutletId" (change)="onFilterChange()">
+        <option *ngFor="let o of outlets" [value]="o.id">{{ o.name }}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>From Date</label>
+      <input type="date" [(ngModel)]="fromDate" (change)="onFilterChange()">
+    </div>
+
+    <div class="filter-group">
+      <label>To Date</label>
+      <input type="date" [(ngModel)]="toDate" (change)="onFilterChange()">
+    </div>
+  </div>
+
+  <!-- Expenses Table -->
+  <div class="table-card">
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th *ngIf="isSuperAdmin">Outlet</th>
+            <th style="text-align: right;">Staff Salary</th>
+            <th style="text-align: right;">Shop Rent</th>
+            <th style="text-align: right;">EB Bill</th>
+            <th style="text-align: right;">Gas Bill</th>
+            <th style="text-align: right;">Misc Expense</th>
+            <th style="text-align: right;">Other Expense</th>
+            <th style="text-align: right;">Total Expense</th>
+            <th style="text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of expenses">
+            <td>{{ getMonthName(item.expenseDate) }}</td>
+            <td *ngIf="isSuperAdmin">{{ item.outletName }}</td>
+            <td style="text-align: right;">₹{{ item.staffSalary | number:'1.2-2' }}</td>
+            <td style="text-align: right;">₹{{ item.shopRent | number:'1.2-2' }}</td>
+            <td style="text-align: right;">₹{{ item.ebBill | number:'1.2-2' }}</td>
+            <td style="text-align: right;">₹{{ item.gasBill | number:'1.2-2' }}</td>
+            <td style="text-align: right;">₹{{ item.miscExpense | number:'1.2-2' }}</td>
+            <td style="text-align: right;">
+              <div *ngIf="item.otherExpenses.length > 0">
+                <span class="other-label" *ngFor="let o of item.otherExpenses" [title]="o.description">
+                  {{ o.description }}: ₹{{ o.amount }}
+                </span>
+              </div>
+              <span *ngIf="item.otherExpenses.length === 0">—</span>
+            </td>
+            <td style="text-align: right; font-weight: 700; color: #d84315;">
+              ₹{{ item.totalAmount | number:'1.2-2' }}
+            </td>
+            <td style="text-align: center; white-space: nowrap;">
+              <button class="action-btn edit-btn" (click)="openEditModal(item)">✏️ Edit</button>
+              <button class="action-btn delete-btn" (click)="deleteExpense(item)">🗑️ Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="expenses.length === 0">
+            <td [attr.colspan]="isSuperAdmin ? 10 : 9" style="text-align: center; color: #777; padding: 30px;">
+              No operational expenses recorded for the selected period.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div *ngIf="showAddForm" class="modal">
+    <div class="modal-box">
+      <h2>Record Operational Expense</h2>
+      <p class="modal-subtitle">Log fixed costs and custom bills</p>
+
+      <div class="modal-form">
+        <div class="form-row">
+          <div class="form-group" *ngIf="isSuperAdmin">
+            <label>Outlet</label>
+            <select [(ngModel)]="newExpense.outletId">
+              <option *ngFor="let o of outlets" [value]="o.id">{{ o.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Expense Month</label>
+            <input type="month" [(ngModel)]="newExpenseMonth">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Staff Salary (₹)</label>
+            <input type="number" [(ngModel)]="newExpense.staffSalary" min="0">
+          </div>
+          <div class="form-group">
+            <label>Shop Rent (₹)</label>
+            <input type="number" [(ngModel)]="newExpense.shopRent" min="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>EB Bill (₹)</label>
+            <input type="number" [(ngModel)]="newExpense.ebBill" min="0">
+          </div>
+          <div class="form-group">
+            <label>Gas Bill (₹)</label>
+            <input type="number" [(ngModel)]="newExpense.gasBill" min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Miscellaneous Expense (₹)</label>
+          <input type="number" [(ngModel)]="newExpense.miscExpense" min="0">
+        </div>
+
+        <!-- Custom Other Expenses -->
+        <div class="other-expenses-section">
+          <h3>Other Expenses (Custom Fields)</h3>
+          
+          <div class="other-row" *ngFor="let o of newExpense.otherExpenses; let i = index">
+            <input type="text" [(ngModel)]="o.description" placeholder="e.g. Internet Bill, Repairs" style="flex: 2;">
+            <input type="number" [(ngModel)]="o.amount" placeholder="Amount (₹)" min="0" style="flex: 1;">
+            <button class="remove-row-btn" (click)="removeOtherExpenseRow('new', i)">❌</button>
+          </div>
+
+          <button class="add-row-btn" (click)="addOtherExpenseRow('new')">
+            ➕ Add Custom Expense Row
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="save-btn" (click)="saveExpense()">Save Record</button>
+        <button class="cancel-btn" (click)="showAddForm = false">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Expense Modal -->
+  <div *ngIf="showEditForm" class="modal">
+    <div class="modal-box">
+      <h2>Edit Operational Expense</h2>
+      <p class="modal-subtitle">Update logs or modify amounts</p>
+
+      <div class="modal-form">
+        <div class="form-group">
+          <label>Expense Month</label>
+          <input type="month" [(ngModel)]="editingExpenseMonth">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Staff Salary (₹)</label>
+            <input type="number" [(ngModel)]="editingExpense.staffSalary" min="0">
+          </div>
+          <div class="form-group">
+            <label>Shop Rent (₹)</label>
+            <input type="number" [(ngModel)]="editingExpense.shopRent" min="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>EB Bill (₹)</label>
+            <input type="number" [(ngModel)]="editingExpense.ebBill" min="0">
+          </div>
+          <div class="form-group">
+            <label>Gas Bill (₹)</label>
+            <input type="number" [(ngModel)]="editingExpense.gasBill" min="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Miscellaneous Expense (₹)</label>
+          <input type="number" [(ngModel)]="editingExpense.miscExpense" min="0">
+        </div>
+
+        <!-- Custom Other Expenses -->
+        <div class="other-expenses-section">
+          <h3>Other Expenses (Custom Fields)</h3>
+          
+          <div class="other-row" *ngFor="let o of editingExpense.otherExpenses; let i = index">
+            <input type="text" [(ngModel)]="o.description" placeholder="e.g. Internet Bill" style="flex: 2;">
+            <input type="number" [(ngModel)]="o.amount" placeholder="Amount" min="0" style="flex: 1;">
+            <button class="remove-row-btn" (click)="removeOtherExpenseRow('edit', i)">❌</button>
+          </div>
+
+          <button class="add-row-btn" (click)="addOtherExpenseRow('edit')">
+            ➕ Add Custom Expense Row
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="save-btn" (click)="saveEditExpense()">Save Changes</button>
+        <button class="cancel-btn" (click)="showEditForm = false">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

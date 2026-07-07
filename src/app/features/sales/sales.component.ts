@@ -147,7 +147,6 @@ export class SalesComponent implements OnInit {
     };
 
     this.loadMenuItems(this.sale.outletId);
-    this.addItem();
 
     this.showModal = true;
   }
@@ -265,5 +264,64 @@ export class SalesComponent implements OnInit {
           );
         }
       });
+  }
+
+  getItemImage(name: string): string {
+    const menuItem = this.menuItems.find(x => x.name === name);
+    if (menuItem?.imageUrl) {
+      return menuItem.imageUrl;
+    }
+    const lowercase = name.toLowerCase();
+    if (lowercase.includes('burger') || lowercase.includes('zinger')) {
+      return 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&auto=format&fit=crop&q=60';
+    }
+    if (lowercase.includes('fries') || lowercase.includes('potato')) {
+      return 'https://images.unsplash.com/photo-1576107232684-1279f390859f?w=400&auto=format&fit=crop&q=60';
+    }
+    if (lowercase.includes('sandwich') || lowercase.includes('toast')) {
+      return 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&auto=format&fit=crop&q=60';
+    }
+    if (lowercase.includes('tea') || lowercase.includes('coffee') || lowercase.includes('beverage') || lowercase.includes('drink')) {
+      return 'https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400&auto=format&fit=crop&q=60';
+    }
+    if (lowercase.includes('pizza')) {
+      return 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=60';
+    }
+    if (lowercase.includes('pav') || lowercase.includes('bun') || lowercase.includes('bread')) {
+      return 'https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=400&auto=format&fit=crop&q=60';
+    }
+    return 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=400&auto=format&fit=crop&q=60';
+  }
+
+  getItemCategory(item: any): string {
+    return item.category || 'Dishes';
+  }
+
+  addItemFromCard(menuItem: any): void {
+    const existing = this.sale.items.find(x => x.menuItemId === menuItem.id);
+    if (existing) {
+      existing.quantity += 1;
+    } else {
+      this.sale.items.push({
+        menuItemId: menuItem.id,
+        quantity: 1,
+        unitPrice: menuItem.sellingPrice
+      });
+    }
+  }
+
+  getCartItemName(menuItemId: string): string {
+    const menu = this.menuItems.find(x => x.id === menuItemId);
+    return menu ? menu.name : 'Unknown Item';
+  }
+
+  changeQuantity(index: number, delta: number): void {
+    const item = this.sale.items[index];
+    if (item) {
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        this.removeItem(index);
+      }
+    }
   }
 }

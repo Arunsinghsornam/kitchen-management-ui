@@ -10,6 +10,8 @@ export interface User {
   role: string;
   outletId?: string;
   outletName?: string;
+  organizationId?: string;
+  organizationName?: string;
   isActive: boolean;
   createdAt: string;
 }
