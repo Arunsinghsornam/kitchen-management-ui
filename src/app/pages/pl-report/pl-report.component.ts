@@ -100,6 +100,8 @@ summaryCards = computed(() => {
 
     if (this.isSuperAdmin) {
       this.loadOutlets();
+      this.outletId = '';
+      this.load();
     } else {
       this.outletId = user?.outletId || '';
       this.load();
@@ -121,10 +123,6 @@ summaryCards = computed(() => {
     this.outletService.getOutlets(this.selectedOrganizationId).subscribe({
       next: (data) => {
         this.outlets = data;
-        if (this.outlets.length > 0 && !this.outletId) {
-          this.outletId = this.outlets[0].id || '';
-          this.load();
-        }
       },
       error: (err) => console.error('Error loading outlets:', err)
     });
@@ -133,7 +131,7 @@ summaryCards = computed(() => {
   onOrganizationChange(): void {
     this.outletId = '';
     this.loadOutlets();
-    this.report.set(null);
+    this.load();
   }
 
   onOutletChange(): void {
@@ -141,7 +139,7 @@ summaryCards = computed(() => {
   }
 
   load(): void {
-    if (!this.outletId) {
+    if (!this.isSuperAdmin && !this.outletId) {
       return;
     }
 
@@ -149,16 +147,17 @@ summaryCards = computed(() => {
       return;
     }
 
-this.loading.set(true);
-this.error.set(null);
+    this.loading.set(true);
+    this.error.set(null);
 
-this.svc
-  .getPLReport(
-    this.outletId,
-    this.dateFrom,
-    this.dateTo
-  )
-  .subscribe({
+    this.svc
+      .getPLReport(
+        this.selectedOrganizationId || null,
+        this.outletId || null,
+        this.dateFrom,
+        this.dateTo
+      )
+      .subscribe({
 
     next: (data) => {
 

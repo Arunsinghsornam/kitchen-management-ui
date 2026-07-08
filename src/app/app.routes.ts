@@ -184,6 +184,21 @@ export const routes: Routes = [
       },
 
       {
+        path: 'reports',
+        canActivate: [
+          roleGuard([
+            'super_admin',
+            'power_admin',
+            'store_manager',
+            'accountant'
+          ])
+        ],
+        loadComponent: () =>
+          import('./features/reports/reports.component')
+            .then(m => m.ReportsComponent)
+      },
+
+      {
         path: 'approvals',
         canActivate: [
           roleGuard([

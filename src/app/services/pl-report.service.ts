@@ -84,14 +84,21 @@ export class PLReportService {
   private base = `${environment.apiUrl}/api/plreport`;
 
   getPLReport(
-    outletId: string,
+    organizationId: string | null,
+    outletId: string | null,
     dateFrom: string,   // 'yyyy-MM-dd'
     dateTo: string      // 'yyyy-MM-dd'
   ): Observable<PLReportResponse> {
-    const params = new HttpParams()
-      .set('outletId', outletId)
+    let params = new HttpParams()
       .set('dateFrom', dateFrom)
       .set('dateTo',   dateTo);
+      
+    if (organizationId) {
+      params = params.set('organizationId', organizationId);
+    }
+    if (outletId) {
+      params = params.set('outletId', outletId);
+    }
 
     return this.http.get<PLReportResponse>(this.base, { params });
   }
