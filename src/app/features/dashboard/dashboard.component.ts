@@ -96,6 +96,17 @@ import { environment } from '../../../environments/environment';
           </div>
         </div>
 
+        <div class="card" style="border: 1px solid #bae6fd; background: #f0f9ff;">
+          <div class="card-top">
+            <span style="color: #0369a1; font-weight: 700;">NET REVENUE</span>
+            <div class="icon" style="background: #e0f2fe; color: #0284c7; font-weight: 700;">₹</div>
+          </div>
+
+          <div class="value" [style.color]="(summary?.netRevenue || 0) >= 0 ? '#0284c7' : '#ef4444'">
+            ₹{{ (summary?.netRevenue || 0) | number:'1.2-2' }}
+          </div>
+        </div>
+
       </div>
 
       <!-- LOW OUTLET SALES ALERTS (only for Super Admin / Power Admin) -->
@@ -227,7 +238,7 @@ import { environment } from '../../../environments/environment';
 
     .cards{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,1fr);
       gap:20px;
     }
 

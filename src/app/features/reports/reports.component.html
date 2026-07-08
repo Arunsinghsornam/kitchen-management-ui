@@ -1,0 +1,373 @@
+<div class="reports-page">
+  <div class="page-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-bottom: 24px;">
+    <div>
+      <h1 style="font-size: 26px; font-weight: 700; color: #5a1b11; margin: 0;">Reports Management</h1>
+      <p style="margin: 4px 0 0 0; color: #666; font-size: 14px;">Analyze metrics across every active module in your kitchen operations</p>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+      <!-- Organization Dropdown for Power Admin -->
+      <div *ngIf="isPowerAdmin" class="filter-box">
+        <select [(ngModel)]="selectedOrganizationId" (change)="onOrganizationChange()" 
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; font-weight: 600;">
+          <option value="">All Organizations</option>
+          <option *ngFor="let org of organizations" [value]="org.id">{{ org.name }}</option>
+        </select>
+      </div>
+
+      <!-- Outlet Dropdown for Super Admin -->
+      <div *ngIf="isSuperAdmin" class="filter-box">
+        <select [(ngModel)]="selectedOutletId" (change)="onFilterChange()" 
+                style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; font-weight: 600;">
+          <option value="">Select Outlet</option>
+          <option *ngFor="let outlet of outlets" [value]="outlet.id">{{ outlet.name }}</option>
+        </select>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <input type="date" [(ngModel)]="fromDate" 
+               style="padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none;" />
+        <span style="color: #666; font-weight: 600;">to</span>
+        <input type="date" [(ngModel)]="toDate" 
+               style="padding: 9px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none;" />
+        <button (click)="runReport()" 
+                style="padding: 9px 16px; background: #ff6b35; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reports-container">
+    <!-- Left Navigation Tabs (Petpooja style) -->
+    <div class="reports-sidebar">
+      <button [class.active]="activeTab === 'summary'" (click)="activeTab = 'summary'">
+        📋 All Summary Report
+      </button>
+      <button [class.active]="activeTab === 'sales-log'" (click)="activeTab = 'sales-log'">
+        🧾 Sales Invoices Log
+      </button>
+      <button [class.active]="activeTab === 'items'" (click)="activeTab = 'items'">
+        🍔 Item Performance Report
+      </button>
+      <button [class.active]="activeTab === 'inventory'" (click)="activeTab = 'inventory'">
+        📦 Inventory Stock Status
+      </button>
+      <button [class.active]="activeTab === 'suppliers'" (click)="activeTab = 'suppliers'">
+        🚚 Suppliers Directory
+      </button>
+      <button [class.active]="activeTab === 'purchases-log'" (click)="activeTab = 'purchases-log'">
+        🛒 Purchase Invoices Log
+      </button>
+      <button [class.active]="activeTab === 'expenses-log'" (click)="activeTab = 'expenses-log'">
+        💸 Expense Breakdown
+      </button>
+    </div>
+
+    <!-- Right Details Panel -->
+    <div class="reports-content-panel">
+      <!-- 1. All Summary Report -->
+      <div *ngIf="activeTab === 'summary'">
+        <div class="report-section-header">
+          <h3>All Restaurant Summary</h3>
+          <p>Financial snapshot for the selected date range</p>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span>Total Sales</span>
+            <h2 class="text-primary">₹{{ financialOverview.totalSales | number:'1.2-2' }}</h2>
+          </div>
+          <div class="metric-card">
+            <span>Total COGS (Material Costs)</span>
+            <h2 style="color: #6b7280;">₹{{ financialOverview.totalCogs | number:'1.2-2' }}</h2>
+          </div>
+          <div class="metric-card">
+            <span>Total Expenses & Purchases</span>
+            <h2 style="color: #ef4444;">₹{{ financialOverview.totalExpenses | number:'1.2-2' }}</h2>
+          </div>
+          <div class="metric-card">
+            <span>Net Profit/Revenue</span>
+            <h2 [style.color]="financialOverview.netProfit >= 0 ? '#10b981' : '#ef4444'">
+              ₹{{ financialOverview.netProfit | number:'1.2-2' }}
+            </h2>
+          </div>
+        </div>
+
+        <div class="reports-card-box" style="margin-top: 24px;">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Revenue Stream / Costs</th>
+                <th style="text-align: right;">Amount (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sales Revenue (Sales After Discount)</td>
+                <td class="amount" style="text-align: right; color: #111827;">₹{{ financialOverview.totalSales | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Cost of Goods Sold (Recipe Ingredients Used)</td>
+                <td class="amount" style="text-align: right; color: #ef4444;">-₹{{ financialOverview.totalCogs | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Operational Expenses Portion (Staff Salaries, Rents, etc.)</td>
+                <td class="amount" style="text-align: right; color: #ef4444;">-₹{{ (financialOverview.totalExpenses - financialOverview.totalPurchases) | number:'1.2-2' }}</td>
+              </tr>
+              <tr>
+                <td>Supplier Purchase Spend</td>
+                <td class="amount" style="text-align: right; color: #ef4444;">-₹{{ financialOverview.totalPurchases | number:'1.2-2' }}</td>
+              </tr>
+              <tr style="border-top: 2px solid #ddd; font-weight: 700; font-size: 15px;">
+                <td>Net Operational Profit</td>
+                <td class="amount" [style.color]="financialOverview.netProfit >= 0 ? '#10b981' : '#ef4444'" style="text-align: right; font-weight: 700;">
+                  ₹{{ financialOverview.netProfit | number:'1.2-2' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 2. Sales Invoices Log -->
+      <div *ngIf="activeTab === 'sales-log'">
+        <div class="report-section-header">
+          <h3>Sales Invoices Log</h3>
+          <p>Complete historical list of sales registered in the system</p>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Channel</th>
+                <th>Items Sold</th>
+                <th style="text-align: right;">Subtotal</th>
+                <th style="text-align: right;">Discount</th>
+                <th style="text-align: right;">Total Bill</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of sales">
+                <td>{{ item.saleDate }}</td>
+                <td>
+                  <span class="channel-badge" [class.outlet]="item.channel === 'OUTLET'"
+                        [class.swiggy]="item.channel === 'SWIGGY'" [class.zomato]="item.channel === 'ZOMATO'">
+                    {{ item.channel }}
+                  </span>
+                </td>
+                <td style="font-size: 13px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="getSaleItemsSummary(item)">
+                  {{ getSaleItemsSummary(item) || 'No items' }}
+                </td>
+                <td style="text-align: right;">₹{{ item.subtotal | number:'1.2-2' }}</td>
+                <td style="text-align: right;">₹{{ item.discount | number:'1.2-2' }}</td>
+                <td class="amount" style="text-align: right; color: #ff6b35;">₹{{ item.total | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="sales.length === 0">
+                <td colspan="6" style="text-align: center;">No sales records found for this range.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. Item Performance Report -->
+      <div *ngIf="activeTab === 'items'">
+        <div class="report-section-header">
+          <h3>Item Wise Sales Performance</h3>
+          <p>Analyzing best-selling recipes, preparation costs, and recipe profitability margins</p>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Dish / Recipe Name</th>
+                <th>Category</th>
+                <th>Quantity Sold</th>
+                <th style="text-align: right;">Total Sales (₹)</th>
+                <th style="text-align: right;">COGS (Food Cost)</th>
+                <th style="text-align: right;">Gross Profit</th>
+                <th style="text-align: right;">Margin %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of itemSummary">
+                <td style="font-weight: 600;">{{ item.name }}</td>
+                <td>{{ item.category }}</td>
+                <td>{{ item.qtySold }}</td>
+                <td style="text-align: right;">₹{{ item.revenue | number:'1.2-2' }}</td>
+                <td style="text-align: right;">₹{{ item.cogs | number:'1.2-2' }}</td>
+                <td style="text-align: right; color: #10b981; font-weight: 600;">₹{{ item.profit | number:'1.2-2' }}</td>
+                <td class="amount" style="text-align: right; color: #ff6b35;">{{ item.margin | number:'1.0-0' }}%</td>
+              </tr>
+              <tr *ngIf="itemSummary.length === 0">
+                <td colspan="7" style="text-align: center;">No dish sales recorded during this range.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. Inventory Stock Status -->
+      <div *ngIf="activeTab === 'inventory'">
+        <div class="report-section-header">
+          <h3>Inventory Stock Status</h3>
+          <p>Complete status, quantities, valuation, and alerts for raw materials on hand</p>
+        </div>
+
+        <div class="metrics-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 24px;">
+          <div class="metric-card">
+            <span>Total Inventory Valuation</span>
+            <h2 class="text-primary">₹{{ getTotalInventoryValuation() | number:'1.2-2' }}</h2>
+          </div>
+          <div class="metric-card">
+            <span>Low Stock Reorder Alerts</span>
+            <h2 [style.color]="lowStockItems.length > 0 ? '#ef4444' : '#10b981'">
+              {{ lowStockItems.length }} Raw Materials
+            </h2>
+          </div>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Raw Material</th>
+                <th>Current Stock</th>
+                <th style="text-align: right;">Avg Cost (₹)</th>
+                <th style="text-align: right;">Total Value (₹)</th>
+                <th>Min Safety Stock</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of rawMaterials">
+                <td style="font-weight: 600;">{{ item.name }}</td>
+                <td [style.color]="item.currentStock <= item.reorderLevel ? '#ef4444' : '#4b5563'" style="font-weight: 600;">
+                  {{ item.currentStock }} {{ item.unit }}
+                </td>
+                <td style="text-align: right;">₹{{ item.averageCost | number:'1.2-2' }}</td>
+                <td style="text-align: right; font-weight: 600;">₹{{ (item.currentStock * item.averageCost) | number:'1.2-2' }}</td>
+                <td>{{ item.reorderLevel }} {{ item.unit }}</td>
+                <td>
+                  <span class="badge" *ngIf="item.currentStock <= item.reorderLevel" style="background: #fee2e2; color: #ef4444; padding: 2px 8px; border-radius: 99px; font-size: 11px;">
+                    Low Stock
+                  </span>
+                  <span class="badge" *ngIf="item.currentStock > item.reorderLevel" style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 99px; font-size: 11px;">
+                    Healthy
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="rawMaterials.length === 0">
+                <td colspan="6" style="text-align: center;">No raw material records found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. Suppliers Directory -->
+      <div *ngIf="activeTab === 'suppliers'">
+        <div class="report-section-header">
+          <h3>Suppliers Directory & Spend</h3>
+          <p>Breakdown of contacts and accumulated procurement spend per supplier partner</p>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Supplier Partner Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th style="text-align: right;">Total Spend (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of supplierDetailsSummary">
+                <td style="font-weight: 600;">{{ item.name }}</td>
+                <td>{{ item.phone }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.address }}</td>
+                <td class="amount" style="text-align: right; color: #ff6b35;">₹{{ item.spend | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="supplierDetailsSummary.length === 0">
+                <td colspan="5" style="text-align: center;">No supplier partner records found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 6. Purchase Invoices Log -->
+      <div *ngIf="activeTab === 'purchases-log'">
+        <div class="report-section-header">
+          <h3>Purchase Invoices Log</h3>
+          <p>Chronological report of supplier procurement invoices registered in the system</p>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Invoice Number</th>
+                <th>Supplier</th>
+                <th>Materials Purchased</th>
+                <th style="text-align: right;">Tax (GST)</th>
+                <th style="text-align: right;">Total Spend</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of purchases">
+                <td>{{ item.purchaseDate }}</td>
+                <td style="font-weight: 600;">{{ item.invoiceNumber || '-' }}</td>
+                <td>{{ item.supplierName }}</td>
+                <td style="font-size: 13px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="getPurchaseItemsSummary(item)">
+                  {{ getPurchaseItemsSummary(item) || 'No items' }}
+                </td>
+                <td style="text-align: right;">₹{{ item.gstAmount | number:'1.2-2' }}</td>
+                <td class="amount" style="text-align: right; color: #ef4444;">₹{{ item.total | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="purchases.length === 0">
+                <td colspan="6" style="text-align: center;">No purchase invoice records found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 7. Expense Breakdown -->
+      <div *ngIf="activeTab === 'expenses-log'">
+        <div class="report-section-header">
+          <h3>Operational Expense Breakdown</h3>
+          <p>Breakdown of operational bills and salary expenses recorded inside the selected month scope</p>
+        </div>
+
+        <div class="reports-card-box">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Expense Category</th>
+                <th style="text-align: right;">Total Spent (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of expenseBreakdown">
+                <td style="font-weight: 600;">{{ item.category }}</td>
+                <td class="amount" style="text-align: right; color: #ef4444;">₹{{ item.amount | number:'1.2-2' }}</td>
+              </tr>
+              <tr *ngIf="expenseBreakdown.length === 0">
+                <td colspan="2" style="text-align: center;">No operational expense records found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -34,7 +34,7 @@
         <label class="text-xs font-medium text-gray-600">Outlet</label>
         <select [(ngModel)]="outletId" (change)="onOutletChange()"
                 style="padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: white; outline: none; min-width: 180px; font-weight: 600;">
-          <option value="">-- Select Outlet --</option>
+          <option value="">All Outlets</option>
           <option *ngFor="let outlet of outlets" [value]="outlet.id">
             {{ outlet.name }}
           </option>
